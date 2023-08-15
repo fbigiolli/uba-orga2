@@ -1,0 +1,23 @@
+.data variables globales inicializadas
+
+.rodata declarar constantes globales inicializadas
+
+.bss declarar variables globales no inicializadas
+
+.text codigo
+
+-----------------------------------------------------
+
+global define un simbolo usable externamente
+
+start define el punto de entrada al programa 
+
+-----------------------------------------------------
+
+la expresion $ se evalua en la posicion en memoria al principio de la linea que contiene la expresion.
+
+-----------------------------------------------------
+
+nasm -f elf64 -g -F DWARF holamundo.asm
+ld -o holamundo holamundo.o
+./holamundo

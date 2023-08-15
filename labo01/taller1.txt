@@ -1,0 +1,54 @@
+1- 
+a) El tamanio de la direccion de memoria es de 64 bits
+b) Esta arquitectura tiene direccionamiento a byte, y las operaciones soportadas por el procesador son minimo byte, o sino word, doubleword quadword (creemos que quadword es 64 bits, y doubleword 32 bits)
+c) 16 GPR, pueden trabajar con operandos de 32 bits (es el tamanio default), pero sin embargo los GPR tienen la capacidad de trabajar en 32 o 64 bits. Los registros R8D-R15D tienen la capacidad de ser accedidos a byte, word dword y qword. 
+d) Es un registro de 64 bits que guarda el offset de la instruccion a ser ejecutada. 
+
+e) Porque hay direccionamiento a byte, word, dword, qword, por lo que una instruccion junto a sus operandos puede variar en tamanio respecto a otra. Entonces, no debemos usar el mismo offset para una instruccion que para otra.
+
+2- 
+a,c) Es de 32 bits, y guarda el estado del programa que se esta ejecutando. Por cada bit guarda el estado de cada flag. En 64 bits se extiende justamente a 64 bits y es llamado RFLAGS. La parte que se extiende queda reservada, y la parte baja es igual a EFLAGS. 
+b) Zero flag bit 6, avisa si el resultado es 0 (menos mal)
+   Carry bit 0, se enciende si hubo overflow en operaciones aritmeticas sin signo, o borrow en el bit mas significativo.
+   Interrupt enable flag bit 9, controla las solicitudes de interrupciones al procesador. Permite interrupciones de aquellos dispositivos habilitados.
+
+3- 
+a,b) Esta ubicada en memoria, y se usa para el soporte procedimientos de llamados de subrutinas, y pasado de parametros entre procedimientos y subrutinas. No tiene un lugar fijo, si no que se encuentra en el entorno de ejecucion.
+
+parte 2
+a,b) El stack se divide en frames. Supongamos que llamamos una subrutina, entonces tenemos un frame nuevo. En el primer elemento de esta subrutina se suele dejar el EBP (aunque no es necesario, es una buena practica, se suele hacer.). A medida que agregamos nuevos elementos el ESP se mueve apuntando al ultimo elemento que agregamos al frame. ? Creemos que si, por ejemplo, hacemos un pop el ESP se va acercando al EBP nuevamente, siguiendo apuntando al ultimo elemento del stack. ?
+
+c,d) El EIP es basicamente el instruction pointer. Cuando hacemos un call, el RIP es un puntero a la instruccion a la que debemos volver, y al llamar a la funcion RET en el EIP se vuelve a poner la instruccion que debia continuar antes de hacer el CALL. Se supone que el RIP se debe guardar en el EBP.
+e) El programador debe asegurarse que el stack pointer este apuntando a la instruccion de retorno en el stack. ESto para evitar cometer errores al hacer el RET. La manera comun de hacer esto es copiar el contenido del registro EBP en el registro ESP
+
+
+e) word o dword, o sea 16/32bits. El procesador no chequea en cual de las dos se alinea el stack, por lo tanto es responsabilidad del programa mantenerlo alineado. El tamanio del PUSH/POP coincide con el ancho del stack. 
+
+En 64 bits PUSHPOP usan 32/64 bits de ancho.
+
+g) Es un registro de proposito general, pero es convencion usarlo para guardar el inicio del frame del stack.
+
+
+-------------------------------------------CHECKPOINT 2----------------------------------  	
+
+INC: incrementa en 1, 1 operando, registro o direccion en memoria, puede ser 8 16 32 o 64 bits. 
+
+INC EAX
+
+SUB: Le resta el segundo operando al primero. Usa registro, inmediato o memoria ambos del mismo tamanio, pero dos operandos de memoria no pueden usarse en una instruccion. Cuando hay un inmediato, se extiende el signo. Puede ser de 8,16,32,64 bits  
+
+SUB EAX , 10
+
+XOR: Hace un XOR bit a bit entre dos operandos, y lo guarda en el operando destino. Puede ser inmediato, registro o memoria, pero ambos operandos no pueden ser de memoria. El inmediato se extiende. El destino no puede ser inmediato. Puede ser de 8,16,32,64 bits
+
+XOR EAX , [23]
+
+JE: Salta si ZF = 1, o sea si al comparar ambos operandos son iguales, para lo cual antes tenemos que hacer el compare. Hay 8,16,32 bits. Tiene un solo operando, que es el offset. 
+
+MOV EAX 2
+MOV EBX 2
+CMP EAX EBX
+JE etiqueta
+
+
+
