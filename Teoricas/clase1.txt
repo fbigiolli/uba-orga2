@@ -1,0 +1,66 @@
+Si vas a final, se puede hacer un tp de maximo 3 integrantes en vez de rendir. El abstract hay que discutirlo con furfi.
+
+La arquitectura es un conjunto de recursos accesibles para el programador.
+Tenemos: 
+-Registros
+-Set de instrucciones
+-Estructuras de memoria (descriptores de segmento, de pagina)
+-De que forma la cpu se relaciona con la memoria
+
+Por otro lado, la microarquitectura es la implementacion en el silicio de la arquitectura. Es lo que esta debajo de la arquitectura.
+
+La implementacion comprende el disenio del circuito integrado, su encapsulado, montaje alimentacion y refrigeracion.
+
+Hay que tener conocimientos en:
+-Disenio logico (VHDL, Verilog e.g.)
+-Tecnologia de encapsulado
+-Funcionamiento y disenio de compiladores y S.O.
+
+-------------------ISA-------------------
+
+Es el set de instrucciones visibles por el programador.
+
+General purpose registers -> los registros sirven para todo
+
+Dedicated registers -> los registros tienen una funcion especifica
+
+Registro-memoria vs load store
+
+Registro-memoria es capaz de hacer una cuenta entre un numero en un registro y uno en dada direccion de memoria.
+
+Las load store tienen que ir a buscar a memoria el valor en otra operacion para hacer la cuenta. 
+
+En terminos de eficiencia, ambos tienen que cargar el dato desde memoria. La diferencia, es que registro-memoria ahorra un fetch, ya que es una operacion menos. De todas formas, no es algo que influya en la performance dado que el bottleneck suele ser la memoria. 
+
+Intel organiza la memoria a byte (8bits).
+
+RISC vs CISC
+
+Saltos condicionales, calls
+
+Tamanio de instruccion fijo vs variable. La diferencia principal es que las instrucciones de tamanio fijo hacen una maquina de ejecucion menos compleja, ya que el PC incrementa siempre la misma cantidad.
+
+---------------Organizacion---------------
+
+Los procesadores AMD FX y los i7 tienen la misma ISA, sin embargo organizan el cache y el motor de ejecucion de manera diferente.
+
+----------------Hardware----------------
+
+Se refiere a los detalles de disenio logico y tecnologia de fabricacion, es nivel mas bajo. Dos procesadores pueden tener misma ISA y organizacion, pero ser absolutamente distintos a nivel de hardware.
+
+--------------Modelo Harvard--------------
+
+Surge por el Von Neumann bottleneck
+
+La principal diferencia es que las instrucciones y los datos tenian datapaths diferentes.
+
+Entonces, una arquitectura se dice Harvard cuando instrucciones y datos se leen desde memorias fisicamente diferentes, y por caminos de senial fisicamente diferentes.
+
+Por lo tanto, puede haber tecnologias y organizaciones diferentes para instrucciones y para datos, y mapas de direcciones particulares en cada caso, y buses diferentes.
+
+Desde la decada del 90 se utilizan distintas jerarquias de memoria, y se utiliza una tecnologia denominada split cache: que divide los primeros niveles de memoria cache en instrucciones y datos con buses independientes para acceder en paralelo. Split cache se hace en el L1. En L2 la memoria se utiliza como en el modelo de Von Neumann. Sin embargo, si manejamos bien el cache deberiamos estar trabajando en una maquina Harvard la gran parte del tiempo. 
+
+-------------------8086-------------------
+
+Esta dividido en dos pipelines.
+Se usa una instruction queue de 6 bytes con el modelo FIFO. 
