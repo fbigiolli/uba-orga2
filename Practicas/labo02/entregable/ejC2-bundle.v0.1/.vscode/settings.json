@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "contar_espacios.h": "c",
+        "limits": "c"
+    }
+}

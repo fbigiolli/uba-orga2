@@ -1,0 +1,14 @@
+type_t arr[N] define un array del tipo t tamanio N
+
+val_type *ptr1 *ptr2; declara dos punteros
+
+Los strings estan implementados como un array de caracteres, se lee hasta el \0 por convencion
+
+Se pueden declarar funciones con un puntero de la sgte manera:
+
+int (*ptr) (int,int) por ejemplo
+
+
+
+
+

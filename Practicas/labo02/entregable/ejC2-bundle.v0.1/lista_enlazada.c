@@ -1,0 +1,156 @@
+#include "lista_enlazada.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+
+lista_t* nueva_lista(void) {
+    // Crear la instancia de la lista
+    lista_t* nueva;
+    
+    // Asignar memoria en el heap
+    nueva = malloc(sizeof(lista_t));
+
+    // Definir el primer nodo como NULL
+    nueva->head = NULL;
+
+    return nueva; 
+}
+
+uint32_t longitud(lista_t* lista) {
+    uint32_t longitud = 0;
+
+    if(lista->head != NULL)
+    {
+        nodo_t* actual = lista->head; 
+        while (actual != NULL)
+        {
+            longitud++;
+            actual = actual->next;
+        }
+    }
+
+    return longitud;
+}
+
+void agregar_al_final(lista_t* lista, uint32_t* arreglo, uint64_t longitud) {
+
+    // Inicializar el nuevo nodo
+    nodo_t* nuevo = malloc(sizeof(nodo_t));
+    // nuevo->arreglo = malloc(sizeof(arreglo)*longitud);
+    nuevo->arreglo = arreglo;
+    nuevo->longitud = longitud;
+    nuevo->next = NULL;
+
+    // Si el head es vacio
+    if (lista->head == NULL)
+    {
+        lista->head = nuevo;
+    }
+
+    else
+    {
+        nodo_t* actual = lista->head;
+
+        // Llegar al ultimo nodo de la lista
+        while (actual->next != NULL)
+        {
+            actual = actual->next;
+        }
+
+        // Actualizar el nuevo ultimo
+        actual->next = nuevo;
+    }    
+}
+
+nodo_t* iesimo(lista_t* lista, uint32_t i) {
+    nodo_t* actual = lista->head; 
+    while (i > 0)
+    {
+        actual = actual->next;
+        i--;
+    }
+    return actual;
+}
+
+uint64_t cantidad_total_de_elementos(lista_t* lista) {
+    uint64_t res = 0; 
+
+    if(lista->head != NULL)
+    {
+        nodo_t* actual = lista->head; 
+        while (actual != NULL)
+        {
+            res+=actual->longitud;
+            actual = actual->next;
+        }
+    }
+
+    return res;
+}
+
+void imprimir_lista(lista_t* lista) {
+    if(lista->head != NULL)
+    {
+        nodo_t* actual = lista->head; 
+        while (actual != NULL)
+        {
+            printf("| %ld | -> ",actual->longitud);
+            actual = actual->next;
+        }
+    }   
+    printf("null");
+}
+
+// Función auxiliar para lista_contiene_elemento
+int array_contiene_elemento(uint32_t* array, uint64_t size_of_array, uint32_t elemento_a_buscar) {
+
+    for (uint64_t i = 0; i < size_of_array; i++)
+    {
+        if (*array == elemento_a_buscar)
+        {
+            return 1;
+        }
+        array++;
+    }
+
+    return 0;
+}
+
+int lista_contiene_elemento(lista_t* lista, uint32_t elemento_a_buscar) {
+    if(lista->head != NULL)
+    {
+        nodo_t* actual = lista->head; 
+        while (actual != NULL)
+        {
+            if (array_contiene_elemento(actual->arreglo,actual->longitud,elemento_a_buscar))
+            {
+                return 1;
+            }
+            actual = actual->next;
+        }
+    }
+    return 0;
+}
+
+
+// Devuelve la memoria otorgada para construir la lista indicada por el primer argumento.
+// Tener en cuenta que ademas, se debe liberar la memoria correspondiente a cada array de cada elemento de la lista.
+void destruir_lista(lista_t* lista) {
+    if(lista->head != NULL)
+    {
+        nodo_t* actual = lista->head; 
+        while (actual != NULL)
+        {
+            // TODO Liberar la memoria del array
+            // free(actual->arreglo);
+            // Liberar la memoria del nodo
+            nodo_t* tmp;
+            tmp = actual->next;
+            free(actual);
+            actual = tmp;
+        }
+
+    }
+    free(lista);
+}
