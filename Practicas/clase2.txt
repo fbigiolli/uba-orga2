@@ -8,6 +8,8 @@ Se pueden declarar funciones con un puntero de la sgte manera:
 
 int (*ptr) (int,int) por ejemplo
 
+_attribute_((_packed_)) le indica al compilador que no use padding para alinear los datos.
+
 
 
 

@@ -80,16 +80,18 @@ vector_t* vector_mas_grande(vector_t** array_de_vectores, size_t longitud_del_ar
     // Chequear que el array no sea vacio
     if (array_de_vectores != NULL)
     {
-        vector_t* actual = *array_de_vectores;
         vector_t* max = *array_de_vectores;
+        size_t count = 0;
 
-        while (actual <= longitud_del_array)
+        while (count < longitud_del_array)
         {
+            vector_t* actual = *array_de_vectores;       
             if (actual->size > max->size)
             {
                 max = actual;
             }
-            actual++;
+            array_de_vectores++;
+            count++;
         }
         return max;
     }

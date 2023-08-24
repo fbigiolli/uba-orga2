@@ -37,8 +37,19 @@ void agregar_al_final(lista_t* lista, uint32_t* arreglo, uint64_t longitud) {
 
     // Inicializar el nuevo nodo
     nodo_t* nuevo = malloc(sizeof(nodo_t));
-    // nuevo->arreglo = malloc(sizeof(arreglo)*longitud);
-    nuevo->arreglo = arreglo;
+    
+    // Reservar memoria para el array y guardar el puntero
+     uint32_t* tmp = malloc(sizeof(arreglo)*longitud);
+     nuevo->arreglo = tmp;
+
+    // Copiar el arreglo
+    for (uint64_t i = 0; i <= longitud; i++)
+    {
+        *tmp = *arreglo;
+        arreglo++;
+        tmp++;
+    }
+
     nuevo->longitud = longitud;
     nuevo->next = NULL;
 
@@ -143,7 +154,7 @@ void destruir_lista(lista_t* lista) {
         while (actual != NULL)
         {
             // TODO Liberar la memoria del array
-            // free(actual->arreglo);
+            free(actual->arreglo);
             // Liberar la memoria del nodo
             nodo_t* tmp;
             tmp = actual->next;
