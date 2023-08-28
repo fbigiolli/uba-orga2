@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 lista_t* nueva_lista(void) {
     // Crear la instancia de la lista
     lista_t* nueva;
@@ -39,11 +38,11 @@ void agregar_al_final(lista_t* lista, uint32_t* arreglo, uint64_t longitud) {
     nodo_t* nuevo = malloc(sizeof(nodo_t));
     
     // Reservar memoria para el array y guardar el puntero
-     uint32_t* tmp = malloc(sizeof(arreglo)*longitud);
-     nuevo->arreglo = tmp;
+    uint32_t* tmp = malloc(sizeof(arreglo)*longitud);
+    nuevo->arreglo = tmp;
 
     // Copiar el arreglo
-    for (uint64_t i = 0; i <= longitud; i++)
+    for (uint64_t i = 0; i <= longitud; i++) 
     {
         *tmp = *arreglo;
         arreglo++;
@@ -153,7 +152,7 @@ void destruir_lista(lista_t* lista) {
         nodo_t* actual = lista->head; 
         while (actual != NULL)
         {
-            // TODO Liberar la memoria del array
+            // Liberar la memoria del array
             free(actual->arreglo);
             // Liberar la memoria del nodo
             nodo_t* tmp;

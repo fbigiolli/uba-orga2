@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef struct classifier_s {
-    char** vowels_and_consonants;
+    char** vowels_and_consonants; //ESTO apunta a NULL
 	char* string;
 } classifier_t;
 

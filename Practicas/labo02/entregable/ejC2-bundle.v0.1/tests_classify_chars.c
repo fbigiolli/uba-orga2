@@ -12,7 +12,7 @@ void test_classify_chars_one(void) {
 
     char* vowels = mi_arr[0].vowels_and_consonants[0];
     char* cons   = mi_arr[0].vowels_and_consonants[1];
-
+    
     char* actual_vowels = "oaoeuouai";
     char* actual_cons   = "rgds-sgnd-ctr";
 
