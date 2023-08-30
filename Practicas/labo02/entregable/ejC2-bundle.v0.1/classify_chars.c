@@ -49,12 +49,12 @@ void classify_chars(classifier_t* array, uint64_t size_of_array)
         array[i].vowels_and_consonants = malloc(2*sizeof(char*));
 
         // Reservar memoria en el heap
-        array[i].vowels_and_consonants[0] = malloc(64 * sizeof(char));
-        array[i].vowels_and_consonants[1] = malloc(64 * sizeof(char));
+        array[i].vowels_and_consonants[0] = malloc(65 * sizeof(char));
+        array[i].vowels_and_consonants[1] = malloc(65 * sizeof(char));
 
         // Inicializar todas las posiciones en 0
-        memset(array[i].vowels_and_consonants[0], 0, 64 * sizeof(char));
-        memset(array[i].vowels_and_consonants[1], 0, 64 * sizeof(char));
+        memset(array[i].vowels_and_consonants[0], 0, 65 * sizeof(char));
+        memset(array[i].vowels_and_consonants[1], 0, 65 * sizeof(char));
 
         // Llamado a la funcion
         classify_chars_in_string(array[i].string, array[i].vowels_and_consonants);

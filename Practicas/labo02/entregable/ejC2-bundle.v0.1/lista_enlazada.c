@@ -155,8 +155,7 @@ void destruir_lista(lista_t* lista) {
             // Liberar la memoria del array
             free(actual->arreglo);
             // Liberar la memoria del nodo
-            nodo_t* tmp;
-            tmp = actual->next;
+            nodo_t* tmp = actual->next;
             free(actual);
             actual = tmp;
         }

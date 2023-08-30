@@ -28,7 +28,6 @@ void push_back(vector_t* vector, uint32_t elemento) {
         uint32_t* array = realloc(vector->array,2*(vector->capacity)*sizeof(uint32_t));
 
         // Actualizar las variables
-        // free(vector->array);
         vector->array = array;
         vector->capacity = vector->capacity * 2; 
     }
