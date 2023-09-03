@@ -15,47 +15,52 @@ global cantidad_total_de_elementos_packed
 ;extern uint32_t cantidad_total_de_elementos(lista_t* lista);
 ;registros: lista	[?]
 cantidad_total_de_elementos:
-    xor rax, rax  ; Inicializa el contador a 0
+        push rbp
+        mov rbp,rsp
 
-contando:
-    ; Verificar si el nodo actual es NULL
-    cmp qword [rdi + 0], NULL
-    je fin  ; Si es NULL, salir del bucle
+        xor rax, rax  ; =0
 
-    ; Obtener el puntero al nodo actual desde la lista
-    mov rsi, [rdi]
+        mov rdi,[rdi] ;accedo  AL head(puntero a nodo)
+    contando:
+        ; compara rdi con rdi y verifico si es 0 para ver si es nulo
+        test rdi,rdi
+        jz fin  ; Si es nulo
 
-    ; Sumar la longitud del arreglo en el nodo actual al contador
-    add rax, [rsi + 0x18] ; Offset de longitud en el nodo (ajusta esto según tu estructura)
+        ; Sumar la longitud del arreglo en el nodo actual al contador
+        add rax, [rdi + 0x18] 
 
-    ; Avanzar al siguiente nodo
-    mov rdi, [rsi] ; Siguiente nodo en la lista
+        mov rdi, [rdi] ; Siguiente nodo 
 
-    jmp contando  ; Continuar en el bucle
+        jmp contando  ; sigo
 
-fin:
-    ret
+    fin:
+        pop rbp
+        ret
 
 
 ;extern uint32_t cantidad_total_de_elementos_packed(packed_lista_t* lista);
 ;registros: lista[?]
 cantidad_total_de_elementos_packed:
-    xor rax, rax ; Inicializar el contador a 0
+        push rbp
+        mov rbp,rsp
 
-	contandoPacked:
-		; Verificar si la lista ha terminado (lista == NULL)
-		cmp qword [rdi], 0
-		je finPacked ; Si es NULL, salir del bucle
+        xor rax, rax  ; =0
 
-		; Sumar la longitud del arreglo en el nodo actual al contador
-		add rax, [rdi + 16] ; Offset de longitud en el nodo packed (ajusta esto según tu estructura)
+        mov rdi,[rdi] ;accedo  AL head(puntero a nodo)
+    .contandop:
+        ; compara rdi con rdi y verifico si es 0 para ver si es nulo
+        test rdi,rdi
+        jz .finp  ; Si es nulo
 
-		; Avanzar al siguiente nodo
-		mov rdi, [rdi] ; Siguiente nodo en lista packed
-		jmp contandoPacked
+        ; Sumar la longitud del arreglo en el nodo actual al contador
+        add rax, [rdi + 0x11] 
 
-		;si no hace el jump hace el ret
-	finPacked:
-		ret
+        mov rdi, [rdi] ; Siguiente nodo 
+
+        jmp .contandop ; sigo
+
+    .finp:
+        pop rbp
+        ret
 
 
