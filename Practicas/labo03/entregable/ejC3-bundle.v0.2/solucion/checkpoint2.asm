@@ -157,8 +157,7 @@ product_9_f:
     cvtss2sd xmm7, xmm7      ; Convierte f8 a double y lo guarda en xmm7
 	cvtss2sd xmm8, [rbp + 0x30]      ; Convierte f9 a double y lo guarda en xmm7
 
-	;multiplicamos los doubles en xmm0 <- xmm0 * xmm1, xmmo * xmm2 , ...
-    mulsd xmm0, xmm0  
+	;multiplicamos los doubles en xmm0 <- xmm0 * xmm1, xmmo * xmm2 , ...  
 	mulsd xmm0, xmm1         ; xmm1 = xmm1 * xmm1
     mulsd xmm0, xmm2         ; xmm1 * xmm2
     mulsd xmm0, xmm3         ;y asi sucesivaente
