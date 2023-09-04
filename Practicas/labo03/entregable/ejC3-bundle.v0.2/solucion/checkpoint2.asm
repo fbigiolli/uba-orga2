@@ -100,8 +100,8 @@ alternate_sum_8:
 	sub rax,r9
 
 	;los traigo del stack,a dos registros temporalres
-	mov r10,[rbp + 0x10]
-	mov r11,[rbp + 0x18]
+	mov r10,[rbp + 0x10] 
+	mov r11,[rbp + 0x18] 
 
 	add rax,r10
 	sub rax,r11
@@ -117,11 +117,10 @@ alternate_sum_8:
 product_2_f:
 
 ;Convert Scalar Doubleword Integer to Scalar Single-Precision Floating-Point)
-	cvtsi2ss xmm1,rsi ;convierte x1 a un valor flotante y lo guarda en xmm0
+	cvtsi2ss xmm1,rsi ;convierte x1 a un valor flotante y lo guarda en xmm1
 	mulss xmm0,xmm1 ;los multiplico asi ya que ambos son floats
 
-	;Convert Scalar Single-Precision Floating-Point to Scalar Doubleword Integer
-
+	;Convertir Entero a Flotante
 
 	cvttps2dq xmm0,xmm0 ;lo trunca es decir le saca la parte decimal
 	movd eax,xmm0 ;me permite mover los 32 bits mas significantes de xmm0
@@ -204,7 +203,7 @@ product_9_f:
 	cvtsi2sd xmm13, r9       ; lo guardo en regsitro temporal x5
     mulsd xmm0, xmm13 
 
-	cvtsi2sd xmm14, [rbp + 0x10]      ; ya este entero no entra en los argumentos de las unciones,lo busco en stack
+	cvtsi2sd xmm14, [rbp + 0x10]      ; ya este entero no entra en los argumentos de las funciones,lo busco en stack
     mulsd xmm0, xmm14 
 
 	cvtsi2sd xmm15, [rbp + 0x18]       ; lo busco en stack

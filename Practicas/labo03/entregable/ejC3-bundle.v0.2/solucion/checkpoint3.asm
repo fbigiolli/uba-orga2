@@ -47,19 +47,19 @@ cantidad_total_de_elementos_packed:
         xor rax, rax  ; =0
 
         mov rdi,[rdi] ;accedo  AL head(puntero a nodo)
-    .contandop:
+    contandop:
         ; compara rdi con rdi y verifico si es 0 para ver si es nulo
         test rdi,rdi
-        jz .finp  ; Si es nulo
+        jz finp  ; Si es nulo
 
         ; Sumar la longitud del arreglo en el nodo actual al contador
         add rax, [rdi + 0x11] 
 
         mov rdi, [rdi] ; Siguiente nodo 
 
-        jmp .contandop ; sigo
+        jmp contandop ; sigo
 
-    .finp:
+    finp:
         pop rbp
         ret
 

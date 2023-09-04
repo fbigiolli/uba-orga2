@@ -189,7 +189,8 @@ TEST(test_strClone_string_normal) {
 	char* ac = strClone(a);
 	TEST_ASSERT(a != ac);
 	strcpy(assert_name, "ac == \"Omega 4\"");
-	TEST_ASSERT(ac[0] == 'O' && ac[1] == 'm' && ac[2] == 'e' && ac[3] == 'g' && ac[4] == 'a' && ac[5] == ' ' && ac[6] == '4' && ac[7] == '\0');
+	TEST_ASSERT(ac[0] == 'O' && ac[1] == 'm' && ac[2] == 'e' && ac[3] == 'g' && ac[4] == 'a' && ac[5] == ' ' && ac[6] == '4');
+	TEST_ASSERT(ac[7] == '\0');
 
 	strDelete(ac);
 }
