@@ -87,6 +87,10 @@ strClone:
     ;prologo
     push rbp
     mov rbp, rsp
+    push r12
+    push r13
+    push r14
+    push r15
 
     ;inicializo contador en 0.
     xor r12,r12 
@@ -139,7 +143,11 @@ strClone:
     jl .copy
 
 .end3:
-    mov byte [r14 + r15], '\0'
+    ;mov byte [r14 + r15], '\0'
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop rbp
     ret
     
