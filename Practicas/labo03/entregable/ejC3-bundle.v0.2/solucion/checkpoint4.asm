@@ -32,11 +32,11 @@ strCmp:
     je .check_a
 
     ; Cargo en al y en bl el char apuntado actualmente
-    mov al, byte [rdi]
-    mov bl, byte [rsi]
+    mov cl, byte [rdi]
+    mov dl, byte [rsi]
     
     ; Compara al y bl
-    cmp al, bl
+    cmp cl, dl
     
     ; Si son diferentes salto
     jne .not_equal
