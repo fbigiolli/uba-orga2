@@ -18,7 +18,7 @@ cantidad_total_de_elementos:
         push rbp
         mov rbp,rsp
 
-        xor rax, rax  ; =0
+        xor eax, eax  ; =0
 
         mov rdi,[rdi] ;accedo  AL head(puntero a nodo)
     contando:
@@ -27,7 +27,7 @@ cantidad_total_de_elementos:
         jz fin  ; Si es nulo
 
         ; Sumar la longitud del arreglo en el nodo actual al contador
-        add rax, [rdi + 0x18] 
+        add eax, [rdi + 0x18] 
 
         mov rdi, [rdi] ; Siguiente nodo 
 
@@ -44,7 +44,7 @@ cantidad_total_de_elementos_packed:
         push rbp
         mov rbp,rsp
 
-        xor rax, rax  ; =0
+        xor eax, eax  ; =0
 
         mov rdi,[rdi] ;accedo  AL head(puntero a nodo)
     contandop:
@@ -53,7 +53,7 @@ cantidad_total_de_elementos_packed:
         jz finp  ; Si es nulo
 
         ; Sumar la longitud del arreglo en el nodo actual al contador
-        add rax, [rdi + 0x11] 
+        add eax, [rdi + 0x11] 
 
         mov rdi, [rdi] ; Siguiente nodo 
 

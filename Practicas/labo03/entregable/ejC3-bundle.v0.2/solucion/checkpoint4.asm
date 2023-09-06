@@ -1,6 +1,7 @@
 extern malloc
 extern free
 extern fprintf
+extern stack_snooper
 
 section .data
 
@@ -116,7 +117,6 @@ strClone:
     mov r13, rdi
 
     inc r12
-    inc r12
 
     ; Mover el tamaño al registro de pasaje de parámetros y llamar a malloc
     mov rdi, r12
@@ -130,10 +130,10 @@ strClone:
 
 .copy:
     ; Mover a un registro temporal (de 8 bits) el valor actual del string
-    mov dl, [r13 + r15]
+    mov bl, [r13 + r15]
 
     ; Copiar el carácter a la posición apuntada por r14 (memoria reservada en el heap por malloc)
-    mov [r14 + r15], dl
+    mov [r14 + r15], bl
 
     ; Incrementar el contador de posición
     inc r15
@@ -153,7 +153,6 @@ strClone:
     
 ; void strDelete(char* a)
 strDelete:
-
     test rdi,rdi 
     jz .end2
     call free
@@ -171,14 +170,14 @@ strLen:
     push rbp
     mov rbp, rsp
 
-    xor rax,rax
+    xor eax,eax
 
  .size2:   
     cmp byte [rdi], 0
     je .final
 
     ;Incrementar el contador de size
-    inc rax
+    inc eax
 
     ;Incrementar el puntero del char
     inc rdi
