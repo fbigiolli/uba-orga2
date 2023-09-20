@@ -1,7 +1,8 @@
 section .rodata
 
-    divisor: times 4 dd 3 ; Nos definimos 4 palabras con el valor 3, para cargar en un registro xmm    
+    divisor: times 4 dd 3.0 ; Nos definimos 4 palabras con el valor 3, para cargar en un registro xmm    
     mascara: db 0x00,0xFF,0xFF,0xFF,0x00,0xFF,0xFF,0xFF,0x00,0xFF,0xFF,0xFF,0x00,0xFF,0xFF,0xFF
+
 section .text
 global temperature_asm
 
@@ -114,7 +115,6 @@ loop_fila:
     ;CVTTPS2PI xmm0, xmm0  
 	cvttps2dq xmm0,xmm0 ;lo trunca es decir le saca la parte decimal
 
-    
     ; Nos traemos 64 bits a un registro separado (t1 y t2)
     movq r10, xmm0
     
@@ -155,13 +155,9 @@ loop_fila:
 
 primer_casouno:
 
-    ; Sumamos 255 a r8 
-    add r8,0xFF
-
-    ; Shifteamos r8 para que nos quede espacio para arrancar con el segundo pixel
-    shl r8,0x08
     ; Ponemos la "mascara"
-   and rax,0xFF
+    and rax,0xFF
+
     ; Armar el valor del pixel cuando t < 32
     shl rax,2 
     add rax,128
@@ -172,14 +168,15 @@ primer_casouno:
     ; Shifteamos r8 3 posiciones para dejar espacio para las otras componentes del pixel 
     shl r8,0x18
 
+    ; Sumamos 255 a r8 
+    add r8,0xFF
 
+    shl r8,0x08
 
     jmp segundo_pixel
+
 primer_casodos:
 
-    ; Poner la transparencia en el pixel
-    add r8,0xFF
-    shl r8,0x08
     ; Poner la primer componente del pixel en r8
     add r8,0xFF 
     shl r8,0x08
@@ -191,17 +188,19 @@ primer_casodos:
     add r8,rax
     shl r8,0x10
 
+    ; Poner la transparencia en el pixel
+    add r8,0xFF
+
+    shl r8, 0x08
+
     jmp segundo_pixel
 
 primer_casotres:
-    ; Poner la transparencia en el pixel
-    add r8,0xFF
-    shl r8,0x08
 
     ; Le aplicamos la "mascara" a rax 
     and rax,0xFF
-    ; Poner la primer componente del pixel
-        
+
+    ; Poner la primer componente del pixel    
     sub rax,0x60 
     shl rax,0x02
     add r8,0xFF
@@ -216,15 +215,14 @@ primer_casotres:
     add r8,rax
     shl r8,0x08
 
-
-    jmp segundo_pixel
-
-
-primer_casocuatro:
-
     ; Poner la transparencia en el pixel
     add r8,0xFF
     shl r8,0x08
+
+    jmp segundo_pixel
+
+primer_casocuatro:
+
     ; Le aplicamos la "mascara" a rax 
     and rax,0xFF
     ; Poner la primer componente del pixel
@@ -241,15 +239,14 @@ primer_casocuatro:
     add r8,0xFF
     shl r8,0x08
 
-
+    ; Poner la transparencia en el pixel
+    add r8,0xFF
+    shl r8,0x08
 
     jmp segundo_pixel
 
 primer_casocinco:
 
-    ; Poner la transparencia en el pixel
-    add r8,0xFF
-    shl r8,0x08
     ; Le aplicamos la "mascara" a rax 
     and rax,0xFF
     ; Poner la primer y segunda componente del pixel
@@ -262,6 +259,9 @@ primer_casocinco:
     sub r8,rax
     shl r8,0x08
 
+   ; Poner la transparencia en el pixel
+    add r8,0xFF
+    shl r8,0x08
 
     jmp segundo_pixel
 
@@ -290,9 +290,6 @@ segundo_pixel:
 
 segundo_casouno:
 
-    ; Sumamos 255 a r8 
-    add r8,0xFF
-    shl r8,0x08
     ; Le aplicamos la "mascara" a r12 
     and r12,0xFF
     ; Armar el valor del pixel cuando t < 32
@@ -303,16 +300,19 @@ segundo_casouno:
     add r8,r12 
 
     ; Shifteamos r8 3 posiciones para dejar espacio para las otras componentes del pixel 
-    shl r8,0x10
-
-    jmp terminar
-segundo_casodos:
+    shl r8,0x18
 
     ; Sumamos 255 a r8 
     add r8,0xFF
-    shl r8,0x08
+
+    jmp terminar
+
+segundo_casodos:
+
+
     ; Le aplicamos la "mascara" a r12 
     and r12,0xFF
+
     ; Poner la primer componente del pixel en r8
     add r8,0xFF 
     shl r8,0x08
@@ -321,16 +321,15 @@ segundo_casodos:
     sub r12,0x20
     shl r12,0x02
     add r8,r12
-    shl r8,0x08
+    shl r8,0x10
 
-
+    ; Sumamos 255 a r8 
+    add r8,0xFF
+    
     jmp terminar
 
 segundo_casotres:
 
-    ; Sumamos 255 a r8 
-    add r8,0xFF
-    shl r8,0x08
     ; Le aplicamos la "mascara" a r12 
     and r12,0xFF
     ; Poner la primer componente del pixel
@@ -347,16 +346,19 @@ segundo_casotres:
     ;Poner la tercer componente en el pixel
     add r8,r12
 
+    shl r8,0x08
+
+    ; Sumamos 255 a r8 
+    add r8,0xFF
+    
     jmp terminar
 
 
 segundo_casocuatro:
 
-    ; Sumamos 255 a r8 
-    add r8,0xFF
-    shl r8,0x08
     ; Le aplicamos la "mascara" a r12 
     and r12,0xFF
+
     ; Poner la primer componente del pixel
     shl r8,0x08
 
@@ -370,13 +372,15 @@ segundo_casocuatro:
     ;Poner la tercer componente en el pixel
     add r8,0xFF
 
+    shl r8,0x08
+
+    ; Sumamos 255 a r8 
+    add r8,0xFF
+
     jmp terminar
 
 segundo_casocinco:
 
-    ; Sumamos 255 a r8 
-    add r8,0xFF
-    shl r8,0x08
     ; Le aplicamos la "mascara" a r12 
     and r12,0xFF
     ; Poner la primer y segunda componente del pixel
@@ -387,6 +391,11 @@ segundo_casocinco:
     shl r12,0x02
     add r8,0xFF
     sub r8,r12
+
+    shl r8,0x08
+
+    ; Sumamos 255 a r8 
+    add r8,0xFF
 
     jmp terminar
 
