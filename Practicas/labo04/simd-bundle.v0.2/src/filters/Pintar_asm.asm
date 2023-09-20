@@ -1,13 +1,13 @@
+global Pintar_asm
 
-section .rodata
+section .data
 
-	4blancos: dq 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-4negros:  dq 0x000000FF000000FF, 0x000000FF000000FF
-2blancos2negros: dq 0x000000FF000000FF , 0xFFFFFFFFFFFFFFFF
-2negros2blancos: dq 0xFFFFFFFFFFFFFFFF, 0x000000FF000000FF
+cuatroblancos: dq 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
+cuatronegros:  dq 0xFF000000FF000000, 0xFF000000FF000000
+dosblancos2negros: dq 0xFF000000FF000000 , 0xFFFFFFFFFFFFFFFF
+dosnegros2blancos: dq 0xFFFFFFFFFFFFFFFF, 0xFF000000FF000000
 
 section .text
-global Pintar_asm
 
 ;void Pintar_asm(unsigned char *src,
 ;              unsigned char *dst,
@@ -39,16 +39,16 @@ Pintar_asm:
 	; Nos creamos unos registros que guardan las posibles combinaciones de colores
 
 	; 4 pixeles negros
-	movdqa xmm0, [4negros]
+	movdqu xmm0, [cuatronegros]
 
 	; 4 pixeles blancos
-	movdqa xmm1, [4blancos]
+	movdqu xmm1, [cuatroblancos]
 
 	; 2 pixeles negros, 2 pixeles blancos
-	movdqa xmm2, [2negros2blancos]
+	movdqu xmm3, [dosnegros2blancos]
 
 	; 2 pixeles blancos, 2 pixeles negros
-	movdqa xmm3, [2blancos2negros] 
+	movdqu xmm2, [dosblancos2negros] 
 
 	
 	; Armar un registro temporal con width para llevar la cuenta de las posiciones que quedan en la fila
@@ -123,6 +123,7 @@ fin_fila:
 pintar_2filas_negras:
 	; Pintamos 4 pixeles de negro de 2 filas a la vez (una y la siguiente)
 	MOVDQU [rsi], xmm0
+	
 	MOVDQU [rsi + r9], xmm0
 
 	; Adelantamos el puntero (rsi), decrementamos la cantidad de pixeles pendientes (r11) y chequeamos si terminamos la fila
@@ -133,6 +134,7 @@ pintar_2filas_negras:
 
 	; Disminuir en 2 el numero de filas que quedan por pintar
 	sub rcx, 0x02
+	add rsi, r9
 	jmp loop_matriz 
 	
 end:
