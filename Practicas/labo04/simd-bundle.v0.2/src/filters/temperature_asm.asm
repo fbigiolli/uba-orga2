@@ -111,16 +111,21 @@ loop_fila:
     ;CVTTPS2PI xmm0, xmm0  
 	cvttps2dq xmm0,xmm0 ;lo trunca es decir le saca la parte decimal
 
-    ; Separamos en dos registros de 32 bits, para tener t1 y t2 por separado
-    ; Guardamos en r12 los 8 bits bajos (t2)
-    movd r12d,xmm0
+    mov r14, 2 ; contador
     
+ciclo_pixel:
+    ; Guardamos en al los 8 bits bajos (t1)
+    movd eax,xmm0
     ; Shifteamos r10 a la derecha para poner t1 en la parte baja, y movemos a otro registro
     psrldq xmm0, 4 
 
-    ; Guardamos en al los 8 bits bajos (t1)
-    movd eax,xmm0
+    cmp r14, 0
+    je terminar_fila
+    dec r14
 
+    jmp comparacion_pixel
+
+comparacion_pixel:
     ; Arrancamos las comparaciones
     ; Si es menor a 32
     cmp eax, 32
@@ -140,7 +145,6 @@ loop_fila:
 
     jmp primer_casocinco
 
-
 primer_casouno:
 
     xor r15, r15
@@ -158,7 +162,7 @@ primer_casouno:
 
     mov [rsi],r15d ; paso al destino el color final
     add rsi, 4
-    jmp segundo_pixel
+    jmp ciclo_pixel
 
 primer_casodos:
 
@@ -179,7 +183,7 @@ primer_casodos:
 
     mov [rsi],r15d
     add rsi, 4
-    jmp segundo_pixel
+    jmp ciclo_pixel
 
 primer_casotres:
 
@@ -203,7 +207,7 @@ primer_casotres:
 
     mov [rsi],r15d
     add rsi, 4
-    jmp segundo_pixel
+    jmp ciclo_pixel
 
 primer_casocuatro:
 
@@ -225,7 +229,7 @@ primer_casocuatro:
 
     mov [rsi],r15d
     add rsi, 4
-    jmp segundo_pixel
+    jmp ciclo_pixel
 
 primer_casocinco:
 
@@ -246,141 +250,9 @@ primer_casocinco:
 
     mov [rsi],r15d
     add rsi, 4
-    jmp segundo_pixel
+    jmp ciclo_pixel
 
-segundo_pixel:
-    
-    ; Si es menor a 32
-    cmp r12d, 32
-    jl segundo_casouno
-
-    ; Si es mayor o igual a 32 y menor a 96
-    cmp r12d, 96
-    jl segundo_casodos
-
-    ; Si es mayor o igual a 96 y menor a 160
-    cmp r12d, 160
-    jl segundo_casotres
-
-    ; Si es mayor o igual a 160 y menor a 224
-    cmp r12d, 224
-    jl segundo_casocuatro
-
-    jmp segundo_casocinco
-
-segundo_casouno:
-
-    xor r15, r15
-
-    add r15d, 0xFF ; transparencia
-    shl r15d, 8
-
-    shl r15d, 8 ; red
-
-    shl r15d, 8 ;green
-    
-    imul r12d, 4
-    add r12d, 128 
-    add r15d, r12d; blue
-
-    
-    mov [rsi],r15d ; paso al destino el color final
-    add rsi, 4
-    jmp terminar
-
-segundo_casodos:
-
-     xor r15, r15
-
-    add r15d, 0xFF ; transparencia
-    shl r15d, 8
-
-    shl r15d, 8 ; red
-
-    sub r12d, 32
-    imul r12d, 4 ; green
-    add r15d, r12d 
-    shl r15d, 8
-    
-    add r15d, 255 ; blue
-    
-
-    mov [rsi],r15d
-    add rsi, 4
-    
-    jmp terminar
-
-segundo_casotres:
-
-    xor r15, r15
-
-    add r15d, 0xFF ; transparencia
-    shl r15d, 8
-
-    sub r12d, 96
-    imul r12d, 4
-    add r15d, r12d
-    shl r15d, 8 ; red
-
-
-    add r15d, 255 ; green
-    shl r15d, 8
-
-
-    add r15d, 255 ; blue
-    sub r15d, r12d
-
-    mov [rsi],r15d
-    add rsi, 4
-
-    jmp terminar
-
-
-segundo_casocuatro:
-
-   xor r15, r15
-
-    add r15d, 0xFF ; transparencia
-    shl r15d, 8
-
-    add r15d, 255 ; red
-    shl r15d, 8
-
-    sub r12d, 160
-    imul r12d, 4
-    add r15d, 255
-    sub r15d, r12d ; green
-    shl r15d, 8
-
-    ;shl r15d, 8 ; blue
-
-    mov [rsi],r15d
-    add rsi, 4
-
-    jmp terminar
-
-segundo_casocinco:
-
-    xor r15, r15
-
-    add r15d, 0xFF ; transparencia
-    shl r15d, 8
-
-    add r15d, 255 
-    sub r12d, 224
-    imul r12d, 4 
-    sub r15d, r12d ; red
-    shl r15d, 8
-
-    shl r15d, 8 ; green
-
-    ;shl r15d, 8 ; blue
-
-    mov [rsi],r15d
-    add rsi, 4
-    jmp terminar
-
-terminar:
+terminar_fila:
 	; Restamos la cantidad de elementos restantes y volvemos al loop
 	add r11, 0x08
 	jmp loop_fila
