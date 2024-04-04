@@ -24,7 +24,7 @@ uint64_t get_size(vector_t* vector) {
 // Agrega un elemento al final del vector
 void push_back(vector_t* vector, uint32_t elemento) {
     if(vector->size == vector->capacity) {
-        vector->array = realloc(vector->array, 2 * vector->capacity);
+        vector->array = realloc(vector->array, 2 * (vector->capacity) * sizeof(uint32_t));
         vector->capacity = 2 * vector->capacity;
     } 
     vector->array[vector->size] = elemento;
