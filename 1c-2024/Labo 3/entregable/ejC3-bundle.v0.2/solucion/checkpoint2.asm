@@ -19,13 +19,13 @@ global alternate_sum_4_using_c
 ; registros: x1[?], x2[?], x3[?], x4[?]
 alternate_sum_4:
 	;prologo
-	; COMPLETAR
 	push rbp
 	mov rbp,rsp 
 
-	xor rax, rax 
-	add rax, rdi 
-	sub rax, rsi 
+	;codigo
+	xor rax, rax ; limpiamos rax 
+	add rax, rdi ; movemos el primer parametro
+	sub rax, rsi ; hacemos el resto de operaciones
 	add rax, rdx 
 	sub rax, rcx 
 
@@ -43,15 +43,15 @@ alternate_sum_4_using_c:
 	push rbp ; alineado a 16
 	mov rbp,rsp
 
-	push r12
+	push r12 ; registros no volatiles para conservar los parametros al hacer call 
 	push r13
 
 	mov r12, rdx
 	mov r13, rcx 
 
-	call restar_c 
+	call restar_c ; hacemos el call directo porque los parametros ya vinieron en los registros de pasaje
 
-	mov rdi,rax 
+	mov rdi,rax ; traemos a rdi desde rax el resultado de la resta para pasarla como parametro al prox call
 	mov rsi,r12 
 
 	call sumar_c
@@ -60,7 +60,6 @@ alternate_sum_4_using_c:
 	mov rsi,r13 
 
 	call restar_c
-	; COMPLETAR
 
 	;epilogo
 	pop r13
@@ -89,10 +88,10 @@ alternate_sum_8:
 	push rbp
 	mov rbp,rsp 
 
-	push r12
+	push r12 ;pusheamos los no volatiles que vamos a usar 
 	push r13
 
-	xor rax, rax 
+	xor rax, rax ; todas las sumas correspondientes a los parametros que nos llegan por registros
 	add rax, rdi 
 	sub rax, rsi 
 	add rax, rdx 
@@ -100,7 +99,7 @@ alternate_sum_8:
 	add rax, r8
 	sub rax, r9
 
-	mov r12, [rbp + 0x18] ;Hacemos esto para traer el septimo y octavo parametro
+	mov r12, [rbp + 0x18] ;Hacemos esto para traer el septimo y octavo parametro que vienen por memoria
 	mov r13, [rbp + 0x10]
 
 	add rax, r12 
@@ -119,6 +118,7 @@ alternate_sum_8:
 ;void product_2_f(uint32_t * destination, uint32_t x1, float f1);
 ;registros: destination[?], x1[?], f1[?]
 product_2_f:
+	;prologo
 	push rbp
 	mov rbp, rsp
 
@@ -128,7 +128,7 @@ product_2_f:
 	cvttps2dq xmm0, xmm0 ; Convertimos de float a integer
 	movd eax, xmm0
 
-	mov [rdi], eax ; mateo no quiere
+	mov [rdi], eax ; mateo no quiere (este no lo comento ahora tampoco porque mateo no quiso antes)
 
 	pop rbp
 	ret
@@ -149,7 +149,7 @@ product_9_f:
 	mov rbp, rsp
 
 	;convertimos los flotantes de cada registro xmm en doubles
-	; COMPLETAR
+	; preguntar dif en la representacion entre doubles y single precision
 
 	cvtss2sd xmm0, xmm0 ;Convierto los floats a double
 	cvtss2sd xmm1, xmm1
@@ -159,11 +159,9 @@ product_9_f:
 	cvtss2sd xmm5, xmm5
 	cvtss2sd xmm6, xmm6
 	cvtss2sd xmm7, xmm7
-
-	movq xmm8, [rbp + 0x30]
+	cvtss2sd xmm8, [rbp + 0x30] ; traemos de memoria el ultimo float y lo convertimos a double tambien
 
 	;multiplicamos los doubles en xmm0 <- xmm0 * xmm1, xmmo * xmm2 , ...
-	; COMPLETAR
 	mulsd xmm0, xmm1
 	mulsd xmm0, xmm2
 	mulsd xmm0, xmm3
@@ -173,10 +171,7 @@ product_9_f:
 	mulsd xmm0, xmm7
 	mulsd xmm0, xmm8
 
-
 	; convertimos los enteros en doubles y los multiplicamos por xmm0.
-	; COMPLETAR
-
 	cvtsi2sd xmm1, rsi
 	cvtsi2sd xmm2, rdx
 	cvtsi2sd xmm3, rcx
@@ -197,7 +192,7 @@ product_9_f:
 	mulsd xmm0, xmm8
 	mulsd xmm0, xmm9
 	
-	movsd [rdi], xmm0 
+	movsd [rdi], xmm0 ; llevamos al destination el resultado. 
 
 	; epilogo
 	pop rbp
