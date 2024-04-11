@@ -48,6 +48,11 @@ cantidad_total_de_elementos_packed:
 	mov rbp, rsp 
 	
 	xor r8, r8
+
+.is_null:
+	cmp rdi, 0
+	je .end
+
 	mov rax, [rdi] ; Muevo a rax la posicion apuntada por el puntero, obtenemos el puntero al nodo head.
 
 .loop:
@@ -58,6 +63,7 @@ cantidad_total_de_elementos_packed:
 
 	mov rax, r8  ; Movemos a rax lo que acumulamos en r8 para devolverlo
 
+.end:
 	;epilogo
 	pop rbp
 	ret

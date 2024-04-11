@@ -13,6 +13,7 @@ global alternate_sum_4_simplified
 global alternate_sum_8
 global product_2_f
 global alternate_sum_4_using_c
+global product_9_f 
 
 ;########### DEFINICION DE FUNCIONES
 ; uint32_t alternate_sum_4(uint32_t x1, uint32_t x2, uint32_t x3, uint32_t x4);
@@ -92,19 +93,20 @@ alternate_sum_8:
 	push r13
 
 	xor rax, rax ; todas las sumas correspondientes a los parametros que nos llegan por registros
-	add rax, rdi 
-	sub rax, rsi 
+	add rax, rdi ; Traemos el x1 al rax
+
+	sub rax, rsi ; hacemos los calculos
 	add rax, rdx 
 	sub rax, rcx 
 	add rax, r8
 	sub rax, r9
 
-	mov r12, [rbp + 0x18] ;Hacemos esto para traer el septimo y octavo parametro que vienen por memoria
-	mov r13, [rbp + 0x10]
+	mov r12, [rbp + 0x10] ;Hacemos esto para traer el septimo y octavo parametro que vienen por memoria
+	mov r13, [rbp + 0x18] ; Los parametros se pushean de derecha a izquierda al stack, por eso traemos x8 a r13 asi.
 
 	add rax, r12 
 	sub rax, r13 
-	;recordar que smi la pila estaba alineada a 16 al hacer la llamada
+	;recordar que si la pila estaba alineada a 16 al hacer la llamada
 	;con el push de RIP como efecto del CALL queda alineada a 8
 
 	;epilogo
@@ -116,7 +118,7 @@ alternate_sum_8:
 
 ; SUGERENCIA: investigar uso de instrucciones para convertir enteros a floats y viceversa
 ;void product_2_f(uint32_t * destination, uint32_t x1, float f1);
-;registros: destination[?], x1[?], f1[?]
+;registros: destination[rdi], x1[rsi], f1[xmm0]
 product_2_f:
 	;prologo
 	push rbp
@@ -128,7 +130,7 @@ product_2_f:
 	cvttps2dq xmm0, xmm0 ; Convertimos de float a integer
 	movd eax, xmm0
 
-	mov [rdi], eax ; mateo no quiere (este no lo comento ahora tampoco porque mateo no quiso antes)
+	mov [rdi], eax 
 
 	pop rbp
 	ret
