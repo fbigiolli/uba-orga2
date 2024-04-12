@@ -17,7 +17,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-valgrind --show-reachable=yes --leak-check=full --error-exitcode=99 ./tester
+valgrind --show-reachable=yes --leak-check=full --error-exitcode=99 --track-origins=yes ./tester
 tester_result=$?
 
 if [ $tester_result -eq 99 ]; then

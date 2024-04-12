@@ -27,40 +27,25 @@ strCmp:
     je .aNulo
 
     cmp byte [rsi], 0 ; cmp para ver si el caracter es nulo
-    je .bNulo
+    je .ganaA ; si B es nulo, entonces gana A porque antes nos fijamos que no sea nulo.
 
     mov al, byte [rdi] ; muevo a al el char representado por r8
     mov cl, byte [rsi] ; muevo a cl el char represetnado por r9
     
     cmp al, cl ; comparar si son iguales, si no salgo y me fijo 
-    jne .dif ; si son diferentes, salir
-    
+	jg .ganaA  ; si A es más grande
+	jl .ganaB ; idem arriba con B
+
     inc rdi ; inc ambos punteros, sigue loop
     inc rsi
     
     jmp .loop
 	
-.bNulo:
-    ; Si estamos acá, es porque b es nulo
-    cmp byte [rdi], 0
-	; (creo que este cmp se puede ahorrar porque primero hace el chequeo de si a es nulo en el loop, pero como no lo puedo probar en esta pc lo dejo jej)
-    je .equal ; si rdi es nulo entonces tambien a es nulo, son iguales
-	; se podria usar la etiqueta ganaA para no repetir codigo (si, curse inge1, como te diste cuenta?) 
-    mov rax , -1 ; si no es el caso entonces a no es nulo,pero b si, gana A
-    jmp .end
-
 .aNulo:
     ; Si estamos acá, es porque a es nulo
     cmp byte [rsi], 0
     je .equal
-	; idem arriba pero con ganaB
-    mov rax , 1
-    jmp .end
-
-.dif:
-	; se puede ahorrar esta etiqueta poniendo ganaA en loop
-	;en este punto tengo los ultimos dos caracteres en al y cl
-	jae .ganaA ; a es mas grande que b porque recien hice el cmp
+    jmp .ganaB
 
 .ganaB:
 	mov rax, 1 ;cl es mas grande
@@ -90,12 +75,11 @@ strClone:
 	xor r12, r12
 	xor r13, r13
 	
-
 	mov r12, rdi ; guardamos el puntero al string a copiar
 	
 	call strLen
 	
-	add rax,1
+	add rax, 1 ; para poner el caracter de fin de string 
 	mov rdi, rax ; pasamos a rdi el largo del string para llamar a malloc, que toma como parametro la cant de bytes.
 	call malloc ; en rax tenemos el puntero a la memoria reservada
 	mov r13, rax ; movemos el puntero al string a devolver a r13 para iterar sobre el. En rax queda el puntero que vamos a retornar
@@ -105,12 +89,13 @@ strClone:
 	cmp [r12], byte 0
 	je .end ; si son iguales, entonces llegamos al final del string, terminamos.
 	mov dil, byte [r12] ; Traemos el char a copiar y lo copiamos en el destino
-	mov byte [r13], dil	
+	mov [r13], dil	
 	inc r12 ; Incrementamos punteros
 	inc r13
 	jmp .loop
 
 .end:
+	mov byte [r13], 0 ; poner el caracter de fin de string
 	;epilogo
 	pop r13
 	pop r12
