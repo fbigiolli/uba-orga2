@@ -16,45 +16,49 @@ global strLen
 ; 0 si son iguales
 ; 1 si a < b
 ; -1 si a > b
-; int32_t strCmp(char* a, char* b)
+; int32_t strCmp(char* a[rdi], char* b[rsi])
 strCmp:
     ;prologo
     push rbp 
     mov rbp, rsp 
 	
 .loop:
-    cmp byte [rdi], 0
-    je .anulo
+    cmp byte [rdi], 0 ; cmp para ver si el caracter es nulo
+    je .aNulo
 
-    cmp byte [rsi], 0
-    je .bnulo
+    cmp byte [rsi], 0 ; cmp para ver si el caracter es nulo
+    je .bNulo
 
     mov al, byte [rdi] ; muevo a al el char representado por r8
-    mov cl, byte [rsi] ; mmuevo a cl el char represetnado por r9 , puse cl en vez de bl porque el tester es alergico al bl
+    mov cl, byte [rsi] ; muevo a cl el char represetnado por r9
     
-    cmp al, cl ; comparar si son iguales,sino salgo y me fijo 
+    cmp al, cl ; comparar si son iguales, si no salgo y me fijo 
     jne .dif ; si son diferentes, salir
     
-    inc rdi
+    inc rdi ; inc ambos punteros, sigue loop
     inc rsi
     
     jmp .loop
 	
-.bnulo:
+.bNulo:
     ; Si estamos acá, es porque b es nulo
     cmp byte [rdi], 0
-    je .equal
+	; (creo que este cmp se puede ahorrar porque primero hace el chequeo de si a es nulo en el loop, pero como no lo puedo probar en esta pc lo dejo jej)
+    je .equal ; si rdi es nulo entonces tambien a es nulo, son iguales
+	; se podria usar la etiqueta ganaA para no repetir codigo (si, curse inge1, como te diste cuenta?) 
     mov rax , -1 ; si no es el caso entonces a no es nulo,pero b si, gana A
     jmp .end
 
-.anulo:
+.aNulo:
     ; Si estamos acá, es porque a es nulo
     cmp byte [rsi], 0
     je .equal
+	; idem arriba pero con ganaB
     mov rax , 1
     jmp .end
 
 .dif:
+	; se puede ahorrar esta etiqueta poniendo ganaA en loop
 	;en este punto tengo los ultimos dos caracteres en al y cl
 	jae .ganaA ; a es mas grande que b porque recien hice el cmp
 
@@ -116,12 +120,12 @@ strClone:
 ; void strDelete(char* a)
 strDelete:
 	push rbp
-	mov rbp,rsp
+	mov rbp,rsp ; stack alineado, se puede hacer el call
 
-	cmp rdi, 0
+	cmp rdi, 0 ; si el puntero apunta a null no hay que liberar nada
 	je .end 
 
-	call free
+	call free 
 
 .end:
 	pop rbp

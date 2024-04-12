@@ -63,9 +63,9 @@ cantidad_total_de_elementos_packed:
 	mov rax, [rax] ; Actualizo rax entrando el nodo next, que es el primer elemento de cada nodo.
 	jmp .loop
 
-
+; PREGUNTAR aca por que al hacer el mov a rax en vez de a eax el resultado que obtenemos es erroneo (incluso cuando ya limpiamos rax con un xor)
 .end:
-	mov eax, r8d  ; Movemos a rax lo que acumulamos en r8 para devolverlo
+	mov eax, r8d  ; Movemos a eax lo que acumulamos en r8 para devolverlo
 	;epilogo
 	pop rbp
 	ret
