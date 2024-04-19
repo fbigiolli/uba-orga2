@@ -25,16 +25,14 @@ cantidad_total_de_elementos:
 	push rbp 
 	mov rbp, rsp 
 
-	xor r8, r8
-	mov rax, [rdi] ; Muevo a rax la posicion apuntada por el puntero, obtenemos el puntero al nodo head.
+	xor rax, rax
+	mov rdi, [rdi] ; Muevo a rdi la posicion apuntada por el puntero, obtenemos el puntero al nodo head.
 
 .loop:
-	add r8, [rax + LONGITUD_OFFSET] ; Al acceder a la direccion de memoria del nodo head sumado el offset obtenemos la longitud
-	mov rax, [rax] ; Actualizo rax entrando el nodo next, que es el primer elemento de cada nodo.
-	cmp rax, 0 ; Chequeamos si el next es null. En ese caso, dejamos de iterar porque terminamos de recorrer la lista.
+	add rax, [rdi + LONGITUD_OFFSET] ; Al acceder a la direccion de memoria del nodo head sumado el offset obtenemos la longitud
+	mov rdi, [rdi] ; Actualizo rdi entrando el nodo next, que es el primer elemento de cada nodo.
+	cmp rdi, 0 ; Chequeamos si el next es null. En ese caso, dejamos de iterar porque terminamos de recorrer la lista.
 	jne .loop
-
-	mov rax, r8 ; Movemos a rax lo que acumulamos en r8 para devolverlo
 
 	; epilogo
 	pop rbp
