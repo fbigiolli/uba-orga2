@@ -61,7 +61,7 @@ Pintar_asm:
 			cmp r12, 4   
 			je .ultimos4PixelesFila ; Si estamos en el borde derecho 
 
-			mov [rsi], xmm2 ; Copiamos a memoria 4 pixel Blanco
+			movdqu [rsi], xmm2 ; Copiamos a memoria 4 pixel Blanco
 			
 			sub r12, 4  ; restamos el acumulador de pixeles restantes
 			add rsi, 16	 ; Avanzamos puntero
@@ -69,14 +69,14 @@ Pintar_asm:
 			jmp .loopFila
 				
 	.primeros4PixelesFila: 
-		mov [rsi], xmm1 ; Copiamos a memoria 4 pixel Blanco
+		movdqu [rsi], xmm1 ; Copiamos a memoria 4 pixel Blanco
 		add rsi, 16	 ; Avanzamos puntero
 		sub r12, 4	; restamos el acumulador de pixeles restantes
 		jmp .loop
 	
 	.ultimos4PixelesFila:
 		add rsi, 16 ; Avanzamos puntero
-		mov [rsi], xmm3 ; Copiamos a memoria 4 pixel Blanco
+		movdqu [rsi], xmm3 ; Copiamos a memoria 4 pixel Blanco
 		sub r12, 4	; restamos el acumulador de pixeles restantes
 		jmp .pintarDosNegras
 
