@@ -190,24 +190,24 @@ TEST(test_four_of_a_kind)
         uint32_t poker_hands_asm = four_of_a_kind_asm(test_data, HANDS);
         TEST_ASSERT_EQUALS(uint32_t, poker_hands_c, poker_hands_asm);
 
-        // if (*test__fallo)
-        // {
-        //     // print hands
-        //     for (int i = 0; i < HANDS; i++)
-        //     {
-        //          printf("Hand %d: ", i);
-        //         for (int j = 0; j < 4; j++)
-        //         {
-        //             print_card(test_data[i * 4 + j]);
-        //             printf(" ");
-        //         }
-        //         if (four_of_a_kind_c(&test_data[i * 4], 1) == 1)
-        //         {
-        //             printf(" (Four of a kind!!)");
-        //         }
-        //         printf("\n");
-        //     }
-        // }
+        if (*test__fallo)
+        {
+            // print hands
+            for (int i = 0; i < HANDS; i++)
+            {
+                 printf("Hand %d: ", i);
+                for (int j = 0; j < 4; j++)
+                {
+                    print_card(test_data[i * 4 + j]);
+                    printf(" ");
+                }
+                if (four_of_a_kind_c(&test_data[i * 4], 1) == 1)
+                {
+                    printf(" (Four of a kind!!)");
+                }
+                printf("\n");
+            }
+        }
         free(test_data);
     }
     free(deck);

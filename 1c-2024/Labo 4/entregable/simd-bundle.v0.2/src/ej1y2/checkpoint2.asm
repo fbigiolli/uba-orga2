@@ -4,10 +4,9 @@ section .rodata
 mascaraTodosCeros: times 32 db 0x00
 mascaraTodosUnos: times 32 db 0xFF
 mascaraConservarValores: times 32 db 0x0F ; Nos quedamos solo con los valores de las cartas,nos sacamos el suit de encima
-mascaraShuffleShiftIzq: dd 0x02010003, 0x0605040C, 0x0A09080B, 0x0E0D0C0F  ; Nueva
+mascaraShuffleShiftIzq: dd 0x02010003, 0x06050407, 0x0A09080B, 0x0E0D0C0F  ; Nueva
 ; mascaraShuffleShiftIzq: dd 0x0E0D0C0F, 0x0A09080B, 0x0605040C, 0x02010003  ; Original
 mascaraComparacionTres: times 4 dd 0x00000003
-
 
 section .text
 
