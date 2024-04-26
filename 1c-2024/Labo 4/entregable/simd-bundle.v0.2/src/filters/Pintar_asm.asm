@@ -34,10 +34,9 @@ Pintar_asm:
 	
 	.pintarDosNegras:
 		
+		mov r12, rdx  ; Copiamos el ancho en pixeles
 		.loopFilaNegra:
 		
-			mov r12, rdx  ; Copiamos el ancho en pixeles
-			
 			movdqu [rsi], xmm0 ; Copiamos los primeros 4 pixeles negros en memoria
 			movdqu [rsi + r8], xmm0  ; + offset para pintar dos filas a la vez
 
@@ -47,12 +46,17 @@ Pintar_asm:
 			jne .loopFilaNegra
 
 		sub rcx, 2  ; restamos 2 a la cantidad de filas restantes
+
+		add rsi, r8 ; como pintamos de a 2 filas, movemos rsi a la proxima fila que es la primera que va de blanco
   
 		cmp rcx, 0 ; para saber si estamos en las ultimas dos filas
 		je .end
 		
 	.loop: 
 		mov r12, rdx  ; Copiamos el ancho en pixeles
+		;chequear si nos quedan solamente las ultimas dos para saltar a pintar dos negras
+		cmp rcx, 2
+		je .pintarDosNegras
 
 		.loopFila:
 			cmp r12, rdx
@@ -69,16 +73,17 @@ Pintar_asm:
 			jmp .loopFila
 				
 	.primeros4PixelesFila: 
-		movdqu [rsi], xmm1 ; Copiamos a memoria 4 pixel Blanco
+		movdqu [rsi], xmm1 ; Copiamos a memoria 2 pixeles Blanco y 2 negros
 		add rsi, 16	 ; Avanzamos puntero
 		sub r12, 4	; restamos el acumulador de pixeles restantes
-		jmp .loop
+		jmp .loopFila
 	
 	.ultimos4PixelesFila:
+		movdqu [rsi], xmm3 ; Copiamos a memoria 2 pixeles Blanco y 2 negros
 		add rsi, 16 ; Avanzamos puntero
-		movdqu [rsi], xmm3 ; Copiamos a memoria 4 pixel Blanco
 		sub r12, 4	; restamos el acumulador de pixeles restantes
-		jmp .pintarDosNegras
+		sub rcx, 1
+		jmp .loop
 
 	.end:
 		pop r13
@@ -86,6 +91,3 @@ Pintar_asm:
 		pop rbp
 		ret
 	
-
-
-
