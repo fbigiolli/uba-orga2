@@ -42,4 +42,18 @@ uint8_t contar_pagos_rechazados(list_t* pList, char* usuario){
 
 pagoSplitted_t* split_pagos_usuario(list_t* pList, char* usuario){
 
+    // int sizeAprobados = contar_pagos_aprobados(pList, usuario);
+    // int sizeRechazados = contar_pagos_rechazados(pList, usuario);
+    // pago_t** aprobados = malloc(sizeAprobados * 8);
+    // pago_t** rechazados = malloc(sizeRechazados * 8);
+
+    // while(hay nodos){
+    //     if nodo cliente == nodo user{
+    //         if rechazad
+    //     }
+    // }
+
+    // pagoSplitted_t* res = malloc(sizeof(pagoSplitted_t));
+    // setear valores de res
+    // devolver res en rax
 }

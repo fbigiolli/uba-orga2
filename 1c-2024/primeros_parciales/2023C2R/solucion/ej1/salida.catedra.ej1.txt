@@ -69,7 +69,7 @@ List length: 28
 ======================== Fin del test 1a ========================= Ejercicio 1b ==
 
 Agregando constelaciones y misiones:
-
+									  
 junta-constelaciones-mision-estrellas:librarigelcruxlibrajunodenebaurigalunadionelunaisspalas
 junta-constelaciones-mision-estrellas:aurigabetelgeusecentaurojunopolluxadharabetelgeusesiriogeminisorioncentaurobetelgeusesiriocefeosagitariocisneganimedesoberontitaniaeris
 junta-constelaciones-mision-estrellas:solcisnepavocefeopavopisiscefeosagitariopavocruxrheaencéladovesta

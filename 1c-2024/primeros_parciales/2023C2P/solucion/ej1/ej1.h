@@ -10,35 +10,35 @@
 #define USE_ASM_IMPL 1
 
 /* Payments */
-typedef struct
+typedef struct                  // 24 bytes
 {
-    uint8_t monto;
-    uint8_t aprobado;
-    char *pagador;
-    char *cobrador;
+    uint8_t monto;              // offset 0
+    uint8_t aprobado;           // offset 1
+    char *pagador;              // offset 8
+    char *cobrador;             // offset 16
 } pago_t;
 
-typedef struct
+typedef struct                  // 24 bytes
 {
-    uint8_t cant_aprobados;
-    uint8_t cant_rechazados;
-    pago_t **aprobados;
-    pago_t **rechazados;
+    uint8_t cant_aprobados;     // offset 0
+    uint8_t cant_rechazados;    // offset 1
+    pago_t **aprobados;         // offset 8
+    pago_t **rechazados;        // offset 16
 } pagoSplitted_t;
 
 /* List */
 
-typedef struct s_listElem
+typedef struct s_listElem    // 24 Bytes
 {
-    pago_t *data;
-    struct s_listElem *next;
-    struct s_listElem *prev;
+    pago_t *data;            // offset 0
+    struct s_listElem *next; // offset 8
+    struct s_listElem *prev; // offset 16
 } listElem_t;
 
-typedef struct s_list
+typedef struct s_list         // 16 bytes
 {
-    struct s_listElem *first;
-    struct s_listElem *last;
+    struct s_listElem *first; // offset 0
+    struct s_listElem *last;  // offset 8
 } list_t;
 
 list_t *listNew();
