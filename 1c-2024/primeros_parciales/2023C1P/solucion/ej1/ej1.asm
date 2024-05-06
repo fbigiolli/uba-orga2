@@ -81,8 +81,6 @@ templosClasicos:
 ; rdi -> array templos, rsi -> tamanio del array
 cuantosTemplosClasicos:
     ; prologo
-    push rbp
-    mov rbp, rsp
 
     xor rax, rax ; rax -> acumulador
     xor rcx, rcx ; rcx -> offset array 
@@ -111,6 +109,5 @@ cuantosTemplosClasicos:
 
     ; epilogo
     .end:
-        pop rbp
         ret
 
