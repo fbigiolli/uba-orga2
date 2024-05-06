@@ -94,15 +94,15 @@ miraQueCoincidencia:
 
         ; cvttps2dq: Convert with truncation packed single precision floating-point values to packed signed doubleword integer values 
         ; cvtps2dq: Convert packed single precision floating-point values to packed signed doubleword integers
+ 
+        haddps xmm6, xmm6 
+        haddps xmm6, xmm6 ; xmm6 -> todos los componentes del pixel valen lo mismo (R0*0.299 + G0*0.587 + B0*0.114)
+        
+        haddps xmm7, xmm7 
+        haddps xmm7, xmm7 ; xmm7 -> todos los componentes del pixel valen lo mismo (R1*0.299 + G1*0.587 + B1*0.114)
 
         cvtps2dq xmm6, xmm6 ; convert a integer para suma horizontal
         cvtps2dq xmm7, xmm7 ; convert a integer para suma horizontal
-
-        phaddd xmm6, xmm6 
-        phaddd xmm6, xmm6 ; xmm6 -> todos los componentes del pixel valen lo mismo (R0*0.299 + G0*0.587 + B0*0.114)
-        
-        phaddd xmm7, xmm7 
-        phaddd xmm7, xmm7 ; xmm7 -> todos los componentes del pixel valen lo mismo (R1*0.299 + G1*0.587 + B1*0.114)
 
         ; pasar a byte
         packssdw xmm6, xmm6
