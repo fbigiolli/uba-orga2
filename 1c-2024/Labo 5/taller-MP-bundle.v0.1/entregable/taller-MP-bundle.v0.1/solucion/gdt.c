@@ -60,6 +60,74 @@ gdt_entry_t gdt[GDT_COUNT] = {
             .base_31_24 = GDT_BASE_HIGH(FLAT_SEGM_BASE),
         },
     
+    [GDT_IDX_CODE_3] =
+        {
+            .limit_15_0 = GDT_LIMIT_LOW(FLAT_SEGM_SIZE),
+            .base_15_0 = GDT_BASE_LOW(FLAT_SEGM_BASE),
+            .base_23_16 = GDT_BASE_MID(FLAT_SEGM_BASE),
+            .type = TYPE_READ_EXECUTE,
+            .s = BIT_ON,
+            .dpl = USER_PRIVILEGE,
+            .p = BIT_ON,
+            .limit_19_16 = GDT_LIMIT_HIGH(FLAT_SEGM_SIZE),
+            .avl = BIT_OFF,
+            .l = BIT_OFF,
+            .db = BIT_ON,
+            .g = BIT_ON,
+            .base_31_24 = GDT_BASE_HIGH(FLAT_SEGM_BASE),
+        },
+
+    [GDT_IDX_DATA_0] =
+        {
+            .limit_15_0 = GDT_LIMIT_LOW(FLAT_SEGM_SIZE),
+            .base_15_0 = GDT_BASE_LOW(FLAT_SEGM_BASE),
+            .base_23_16 = GDT_BASE_MID(FLAT_SEGM_BASE),
+            .type = TYPE_READ_WRITE,
+            .s = BIT_ON,
+            .dpl = ROOT_PRIVILEGE,
+            .p = BIT_ON,
+            .limit_19_16 = GDT_LIMIT_HIGH(FLAT_SEGM_SIZE),
+            .avl = BIT_OFF,
+            .l = BIT_OFF,
+            .db = BIT_ON,
+            .g = BIT_ON,
+            .base_31_24 = GDT_BASE_HIGH(FLAT_SEGM_BASE),
+        },
+
+    [GDT_IDX_DATA_3] =
+        {
+            .limit_15_0 = GDT_LIMIT_LOW(FLAT_SEGM_SIZE),
+            .base_15_0 = GDT_BASE_LOW(FLAT_SEGM_BASE),
+            .base_23_16 = GDT_BASE_MID(FLAT_SEGM_BASE),
+            .type = TYPE_READ_WRITE,
+            .s = BIT_ON,
+            .dpl = USER_PRIVILEGE,
+            .p = BIT_ON,
+            .limit_19_16 = GDT_LIMIT_HIGH(FLAT_SEGM_SIZE),
+            .avl = BIT_OFF,
+            .l = BIT_OFF,
+            .db = BIT_ON,
+            .g = BIT_ON,
+            .base_31_24 = GDT_BASE_HIGH(FLAT_SEGM_BASE),
+        },
+
+    [GDT_IDX_VIDEO] =
+        {
+            .limit_15_0 = 0x1F3F,
+            .base_15_0 = 0x8000,
+            .base_23_16 = 0x0B,
+            .type = TYPE_READ_WRITE,
+            .s = BIT_ON,
+            .dpl = USER_PRIVILEGE,
+            .p = BIT_ON,
+            .limit_19_16 = 0x0,
+            .avl = BIT_OFF,
+            .l = BIT_OFF,
+            .db = BIT_ON,
+            .g = BIT_OFF,
+            .base_31_24 = 0x00,
+        }    
+    
 };
 
 // Aca hay una inicializacion estatica de una structura que tiene su primer componente el tamano 

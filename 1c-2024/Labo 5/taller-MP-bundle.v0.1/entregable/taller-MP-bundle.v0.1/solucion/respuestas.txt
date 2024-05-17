@@ -1,3 +1,5 @@
+https://docs.google.com/spreadsheets/d/1lHLmEvXKtG8BvrTMoPCrvTwASWnYP8e7XWrxqeo5YRY/edit
+
 1) Explorando el manual Intel Volumen 3: System Programming. Sección 2.2 Modes of Operation. ¿A qué nos
 referimos con modo real y con modo protegido en un procesador Intel? ¿Qué particularidades tiene cada
 modo?
@@ -27,8 +29,3 @@ Cada descriptor de segmento posee:
     - Una granularidad, que establece la unidad de medida del campo límite. Si G = 0, el maximo offset de un byte es igual a límite.
     Si G = 1, el maximo offset es igual a Límite * 0x1000 + 0xFFF.
 
-
-
-4) La tabla de la sección 3.4.5.1 Code- and Data-Segment Descriptor Types del volumen 3 del manual del Intel
-nos permite completar el Type, los bits 11, 10, 9, 8. ¿Qué combinación de bits tendríamos que usar si
-queremos especificar un segmento para ejecución y lectura de código?

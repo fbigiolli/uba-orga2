@@ -9,11 +9,15 @@ global start
 
 
 ; COMPLETAR - Agreguen declaraciones extern según vayan necesitando
+extern A20_enable
+extern GDT_DESC
+extern screen_draw_layout
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
-;%define CS_RING_0_SEL ??   
-;%define DS_RING_0_SEL ??   
-
+%define CS_RING_0_SEL  0x08   
+                    ; 0b1000   
+%define DS_RING_0_SEL 0x18   
+                    ; 0b11000
 
 BITS 16
 ;; Saltear seccion de datos
@@ -35,8 +39,8 @@ start_pm_len equ    $ - start_pm_msg
 ;; Punto de entrada del kernel.
 BITS 16
 start:
-    ; COMPLETAR - Deshabilitar interrupciones
-
+    ; Deshabilitar interrupciones
+    cli
 
     ; Cambiar modo de video a 80 X 50
     mov ax, 0003h
@@ -45,34 +49,60 @@ start:
     mov ax, 1112h
     int 10h ; load 8x8 font
 
-    ; COMPLETAR - Imprimir mensaje de bienvenida - MODO REAL
-    ; (revisar las funciones definidas en print.mac y los mensajes se encuentran en la
-    ; sección de datos)
+    ; Imprimir mensaje de bienvenida - MODO REAL
+    print_text_rm start_rm_msg, start_rm_len, 0x5F, 40, 20
+    
+    ; Habilitar A20
+    call A20_enable
+    
+    ; Cargar la GDT
+    lgdt [GDT_DESC]
 
-    ; COMPLETAR - Habilitar A20
-    ; (revisar las funciones definidas en a20.asm)
+    ; LGDT: Loads the values in the source operand into the global descriptor table register (GDTR).
+    ; The source operand specifies a 6-byte memory location that contains the base address (a linear address) 
+    ; and the limit (size of table in bytes) of the global descriptor table (GDT).
+    ; If operand-size attribute is 32 bits, a 16-bit limit (lower 2 bytes of the 6-byte data operand) 
+    ; and a 32-bit base address (upper 4 bytes of the data operand) are loaded into the register. 
+    ; If the operand-size attribute is 16 bits, a 16-bit limit (lower 2 bytes) 
+    ; and a 24-bit base address (third, fourth, and fifth byte) are loaded. 
+    ; Here, the high-order byte of the operand is not used and the high-order byte of the base address 
+    ; in the GDTR or IDTR is filled with zeros.
 
-    ; COMPLETAR - Cargar la GDT
+    ; Setear el bit PE del registro CR0
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
 
-    ; COMPLETAR - Setear el bit PE del registro CR0
-
-    ; COMPLETAR - Saltar a modo protegido (far jump)
+    ; Saltar a modo protegido (far jump)
+    jmp CS_RING_0_SEL:modo_protegido
     ; (recuerden que un far jmp se especifica como jmp CS_selector:address)
     ; Pueden usar la constante CS_RING_0_SEL definida en este archivo
 
+
 BITS 32
 modo_protegido:
-    ; COMPLETAR - A partir de aca, todo el codigo se va a ejectutar en modo protegido
+    ; A partir de aca, todo el codigo se va a ejectutar en modo protegido
     ; Establecer selectores de segmentos DS, ES, GS, FS y SS en el segmento de datos de nivel 0
     ; Pueden usar la constante DS_RING_0_SEL definida en este archivo
 
-    ; COMPLETAR - Establecer el tope y la base de la pila
-
+    mov ax, DS_RING_0_SEL
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov fs, ax
+    mov ss, ax
+    
+    ; Establecer el tope y la base de la pila
+    mov ebp, 0x25000
+    mov esp, ebp
+    
+    
     ; COMPLETAR - Imprimir mensaje de bienvenida - MODO PROTEGIDO
+    print_text_pm start_pm_msg, start_pm_len, 0x5F, 40, 20
 
     ; COMPLETAR - Inicializar pantalla
+    call screen_draw_layout
     
-   
     ; Ciclar infinitamente 
     mov eax, 0xFFFF
     mov ebx, 0xFFFF

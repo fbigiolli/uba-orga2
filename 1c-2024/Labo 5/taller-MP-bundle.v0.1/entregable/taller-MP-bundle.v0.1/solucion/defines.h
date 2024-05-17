@@ -70,10 +70,15 @@
 #define VIDEO_SEGM_SIZE  ??
 
 #define FLAT_SEGM_BASE 0x00000000
-#define BIT_ON 1
 
-#define TYPE_READ_EXECUTE 0b1010
-#define TYPE_READ_WRITE 0b0010
+#define BIT_ON  1
+#define BIT_OFF 0
+
+#define TYPE_READ_EXECUTE 0x0A   // 0b1010
+#define TYPE_READ_WRITE   0x02   // 0b0010
+
+#define ROOT_PRIVILEGE 0x0 // 0b00
+#define USER_PRIVILEGE 0x03 // 0b11
 
 /* Direcciones de memoria */
 /* -------------------------------------------------------------------------- */
