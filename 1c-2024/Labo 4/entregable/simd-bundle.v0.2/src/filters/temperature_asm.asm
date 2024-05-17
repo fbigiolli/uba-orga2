@@ -7,11 +7,7 @@ mascaraDivisionTres: times 4 dd 0x00000003
 ; xmm5 es registro temporal en calculo de casos.
 ; OJO PUEDE ESTAR MAL
 
-; B G R A   B G R A   B G R A     B  G  R  A
-; 0 1 2 3 | 4 5 6 7 | 8 9 10 11 | 12 13 14 15
-
-;                                0
-mascaraR255: times 4 dd 0x00FF0000 
+mascaraR255: dd 0x00FF0000 , 0x00FF0000, 0x00FF0000, 0x00FF0000
 mascaraG255: times 4 dd 0x0000FF00
 mascaraB255: times 4 dd 0x000000FF
 mascaraTransparencia: times 4 dd 0xFF000000  
