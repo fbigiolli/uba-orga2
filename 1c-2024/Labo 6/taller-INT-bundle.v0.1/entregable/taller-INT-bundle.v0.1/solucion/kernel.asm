@@ -104,8 +104,8 @@ modo_protegido:
     call screen_draw_layout
 
     ; Inicializamos y cargamos la IDT
-    call idt_init
     lidt [IDT_DESC]
+    call idt_init
 
     ; Inicializar PICs
     call pic_reset

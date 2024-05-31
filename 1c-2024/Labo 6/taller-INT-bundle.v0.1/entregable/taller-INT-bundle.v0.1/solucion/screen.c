@@ -70,6 +70,6 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
 }
 
 void screen_draw_layout(void) {
-  screen_draw_box(0,0,VIDEO_FILS,VIDEO_COLS,' ', C_BG_GREEN);
+  screen_draw_box(0,0,VIDEO_FILS,VIDEO_COLS,' ', C_BG_LIGHT_GREY);
   print("Yo al barco del permiso de sistema, NO ME SUBO",20,20,C_BG_MAGENTA);
 }
