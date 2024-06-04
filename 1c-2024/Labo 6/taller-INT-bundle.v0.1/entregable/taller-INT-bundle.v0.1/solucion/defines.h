@@ -67,7 +67,7 @@
 
 /* COMPLETAR - Tamaños de segmentos */ 
 #define FLAT_SEGM_SIZE   GDT_LIMIT_4KIB(1024 * 1024 * 817)   // En 4k
-#define VIDEO_SEGM_SIZE  ??
+#define VIDEO_SEGM_SIZE  (50 * 80 * 2)
 
 #define FLAT_SEGM_BASE 0x00000000
 

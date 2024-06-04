@@ -137,8 +137,10 @@ global _isr33
 _isr33:
     pushad
     
-    in al, 0x60
+    in eax, 0x60
+    push eax
     call process_scancode 
+    pop eax
     call pic_finish1
     
     popad

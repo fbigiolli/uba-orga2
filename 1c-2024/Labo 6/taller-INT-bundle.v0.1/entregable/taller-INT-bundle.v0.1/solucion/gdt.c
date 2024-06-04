@@ -113,18 +113,18 @@ gdt_entry_t gdt[GDT_COUNT] = {
 
     [GDT_IDX_VIDEO] =
         {
-            .limit_15_0 = 0x1F3F,
-            .base_15_0 = 0x8000,
-            .base_23_16 = 0x0B,
+            .limit_15_0 = GDT_LIMIT_LOW(GDT_LIMIT_4KIB(VIDEO_SEGM_SIZE)),
+            .base_15_0 = GDT_BASE_LOW(VIDEO),
+            .base_23_16 = GDT_BASE_MID(VIDEO),
             .type = TYPE_READ_WRITE,
             .s = BIT_ON,
             .dpl = USER_PRIVILEGE,
             .p = BIT_ON,
-            .limit_19_16 = 0x0,
+            .limit_19_16 = GDT_LIMIT_HIGH(GDT_LIMIT_4KIB(VIDEO_SEGM_SIZE)),
             .avl = BIT_OFF,
             .l = BIT_OFF,
             .db = BIT_ON,
-            .g = BIT_OFF,
+            .g = BIT_ON,
             .base_31_24 = 0x00,
         }    
     

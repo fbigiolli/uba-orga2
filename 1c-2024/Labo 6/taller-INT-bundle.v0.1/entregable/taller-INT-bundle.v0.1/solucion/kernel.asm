@@ -104,8 +104,8 @@ modo_protegido:
     call screen_draw_layout
 
     ; Inicializamos y cargamos la IDT
-    lidt [IDT_DESC]
     call idt_init
+    lidt [IDT_DESC]
 
     ; Inicializar PICs
     call pic_reset
@@ -118,6 +118,9 @@ modo_protegido:
     int 88
     int 98
 
+    int 32
+    int 33
+    
     ; Ciclar infinitamente 
     mov eax, 0xFFFF
     mov ebx, 0xFFFF
