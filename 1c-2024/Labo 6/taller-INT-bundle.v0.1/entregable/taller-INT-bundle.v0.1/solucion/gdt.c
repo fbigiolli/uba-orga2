@@ -125,7 +125,7 @@ gdt_entry_t gdt[GDT_COUNT] = {
             .l = BIT_OFF,
             .db = BIT_ON,
             .g = BIT_ON,
-            .base_31_24 = 0x00,
+            .base_31_24 = GDT_BASE_HIGH(VIDEO),
         }    
     
 };
