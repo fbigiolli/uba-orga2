@@ -186,6 +186,6 @@ next_clock:
                 mov ebx, 0
         .ok:
                 add ebx, isrClock
-                print_text_pm ebx, 1, 0x0f, 24, 100
+                print_text_pm ebx, 1, 0x0f, 49, 79
                 popad
         ret
