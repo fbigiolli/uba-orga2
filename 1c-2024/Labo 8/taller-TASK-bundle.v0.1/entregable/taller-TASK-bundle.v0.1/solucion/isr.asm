@@ -143,18 +143,14 @@ ISRNE 20
 global _isr14
 
 _isr14:
-	; Estamos en un page fault.
-	pushad
-    ; COMPLETAR: llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
-    .ring0_exception:
-	; Si llegamos hasta aca es que cometimos un page fault fuera del area compartida.
-    call kernel_exception
-    jmp $
-
-    .fin:
-	popad
-	add esp, 4 ; error code
-	iret
+    pushad
+    mov eax, cr2
+    push eax
+    call page_fault_handler
+    add esp, 4
+    popad 
+    add esp, 4
+    iret
 
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
@@ -163,19 +159,20 @@ global _isr32
 _isr32:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
-    call pic_finish1
-    call next_clock
+    call pic_finish1 ; notifica al pic que se atendio la interrupcion
+    call next_clock ; actualiza lo que se muestra en pantalla (clock)
+    
     ; 2. Realizamos el cambio de tareas en caso de ser necesario
-    call sched_next_task
-    cmp ax, 0
-    je .fin
+    call sched_next_task ; se encarga de devolver en ax el selector de la proxima tarea
+    cmp ax, 0 ; se fija si no es nula
+    je .fin ; si es nula va al fin
 
-    str bx
-    cmp ax, bx
-    je .fin
+    str bx ; manda a bx el selector de la tarea actual
+    cmp ax, bx ; se fija si es la misma
+    je .fin ; si es igual se va al fin
 
-    mov word [sched_task_selector], ax
-    jmp far [sched_task_offset]
+    mov word [sched_task_selector], ax ; si no es nula, cambia el selector para apuntar a la nueva tarea
+    jmp far [sched_task_offset] ; hace el jmp far para que se haga el cambio de tarea y por ende de contexto
 
     .fin:
     ; 3. Actualizamos las estructuras compartidas ante el tick del reloj
@@ -185,6 +182,17 @@ _isr32:
     popad
     iret
 
+    ; TAMANIO DEL SELECTOR QUE LEE EN EL JMP FAR 
+    ; 15                   3 2  1 0
+    ; +---------------------+--+--+
+    ; |       Index         |TI|RPL|
+    ; +---------------------+--+--+
+
+  ; al hacer el jmp far el offset no importa ya que el procesador va a levantar el contexto de la tarea que se estaba ejecutando
+  ; y por lo tanto va a usar el offset que tiene el eip correspondiente.
+
+  ; al volver del cambio de contexto la tarea retoma en la interrupcion que sigue del jmp far,
+  ; que es la instruccion que realiza el cambio de contexto
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
 global _isr33

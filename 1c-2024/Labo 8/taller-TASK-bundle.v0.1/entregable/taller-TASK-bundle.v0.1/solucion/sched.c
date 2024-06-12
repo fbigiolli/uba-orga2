@@ -105,7 +105,7 @@ uint16_t sched_next_task(void) {
     if (sched_tasks[i % MAX_TASKS].state == TASK_RUNNABLE) {
       break;
     }
-  }
+  } // loopea por todas las tareas hasta encontrar la primera que tenga el estado TASK_RUNNABLE (se puede correr creo)
 
   // Ajustamos i para que esté entre 0 y MAX_TASKS-1
   i = i % MAX_TASKS;
