@@ -21,6 +21,7 @@ extern pic_enable
 extern pic_disable
 
 extern mmu_init_kernel_dir
+extern mmu_init_task_dir
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
 %define CS_RING_0_SEL  0x08   
@@ -125,7 +126,6 @@ modo_protegido:
     ; Habilitamos interrupciones
     sti
 
-
     ; Interrumpimos
     ; int 88
     ; int 98
@@ -133,6 +133,15 @@ modo_protegido:
     ; int 32
     ; int 33
     
+    push 0xC050
+    call mmu_init_task_dir ; Devuelve un esquema de paginación para una tarea
+    mov ecx, cr3 ; Me guardo el CR3 de la tarea idle
+    mov cr3, eax ; Cargo el esquema de paginación que creé
+    ; pongo un breakpoint acá para ver que funque todo
+
+    mov dword [0x07000020], 0x0000B0CA ;En la memoria del ondemand escribimos un valor
+    mov dword [0x07000BCA], 0x00000700
+
     ; Ciclar infinitamente 
     mov eax, 0xFFFF
     mov ebx, 0xFFFF

@@ -16,6 +16,7 @@ extern kernel_exception
 
 extern process_scancode
 
+extern page_fault_handler
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
 
@@ -109,13 +110,28 @@ ISRE 10
 ISRE 11
 ISRE 12
 ISRE 13
-ISRE 14
+; ISRE 14
 ISRNE 15
 ISRNE 16
 ISRE 17
 ISRNE 18
 ISRNE 19
 ISRNE 20
+
+; Page fault handler
+;; -------------------------------------------------------------------------- ;;
+global _isr14
+; cr2: Contains a value called Page Fault Linear Address (PFLA). 
+; When a page fault occurs, the address the program attempted to access is stored in the CR2 register. 
+_isr14:
+    pushad
+    mov eax, cr2
+    push eax
+    call page_fault_handler
+    add esp, 4
+    popad 
+    add esp, 4
+    iret
 
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
@@ -170,7 +186,6 @@ _isr98:
 %define offset_EBP 8
 %define offset_ESI 4
 %define offset_EDI 0
-
 
 ;; Funciones Auxiliares
 ;; -------------------------------------------------------------------------- ;;

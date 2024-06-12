@@ -46,7 +46,9 @@ static inline void zero_page(paddr_t addr) {
 }
 
 
-void mmu_init(void) {}
+void mmu_init(void) {
+  
+}
 
 
 /**
@@ -63,7 +65,7 @@ segun muestra la figura 1. Cuantas entradas del directorio de pagina hacen falta
 paddr_t mmu_next_free_kernel_page(void) {
   paddr_t current_free_kernel_page = next_free_kernel_page; 
   next_free_kernel_page = next_free_kernel_page + PAGE_SIZE;
-  zero_page(current_free_kernel_page);
+  // zero_page(current_free_kernel_page);
   return current_free_kernel_page;
 }
 
@@ -74,7 +76,7 @@ paddr_t mmu_next_free_kernel_page(void) {
 paddr_t mmu_next_free_user_page(void) {
   paddr_t current_free_user_page = next_free_user_page; 
   next_free_user_page = next_free_user_page + PAGE_SIZE;
-  zero_page(current_free_user_page);
+  // zero_page(current_free_user_page);
   return current_free_user_page;
 }
 
@@ -86,23 +88,23 @@ paddr_t mmu_next_free_user_page(void) {
  */
 paddr_t mmu_init_kernel_dir(void) {
 
-    zero_page(kpd);
-    zero_page(kpt);
+    zero_page((paddr_t) kpd);
+    zero_page((paddr_t) kpt);
 
     uint32_t total_iterations = (identity_mapping_end + 1) / PAGE_SIZE;
               
     for (size_t i = 0; i < total_iterations; i++) {
         // attrs = 0b000100000011
         // page era = (identity_mapping_beginning + i * PAGE_SIZE)
-        pt_entry_t current_entry = {.attrs = 0x103, .page = i}; // capaz los attr estan al reves 
+        pt_entry_t current_entry = {.attrs = MMU_P | MMU_W, .page = i}; // capaz los attr estan al reves 
         kpt[i] = current_entry;
     }
 
-    kpd[0] = (pd_entry_t){.attrs = 0x103, .pt = 0x26}; 
+    kpd[0] = (pd_entry_t){.attrs = MMU_P | MMU_W, .pt = 0x26}; 
     // estan bien los attr? no los cambiamos, dejamos los de la pt
     // Ese 0x26 era originalmente KERNEL_PAGE_TABLE_0 = 0x26000
 
-    return kpd;
+    return (paddr_t) kpd;
 }
 
 /**
@@ -133,12 +135,14 @@ void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {
     
     if (!(page_directory_entry.attrs & MMU_P)) {
         base_page_directory[offset_page_directory] = (pd_entry_t) {.attrs = attrs, .pt = (mmu_next_free_kernel_page() >> 12)};  
+        // nos traemos el actualizado
+        page_directory_entry = base_page_directory[offset_page_directory];
     }
     
     // 3) Crear la entrada de la page table
 
-    uint32_t newAttrs = (page_directory_entry.attrs & attrs) | MMU_P;
-    pt_entry_t* page_table_base = page_directory_entry.pt;
+    uint32_t newAttrs = (page_directory_entry.attrs | attrs) | MMU_P;
+    pt_entry_t* page_table_base = page_directory_entry.pt << 12;
     page_table_base[offset_table_directory] = (pt_entry_t) {.attrs = newAttrs, .page = phy >> 12};
 
     tlbflush();
@@ -164,17 +168,25 @@ void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {
  */
 paddr_t mmu_unmap_page(uint32_t cr3, vaddr_t virt) {
 
+    uint32_t phy = 0;
+
     uint32_t offset_page_directory = VIRT_PAGE_DIR(virt);
     uint32_t offset_table_directory = VIRT_PAGE_TABLE(virt);
     uint32_t offset_physical_page = VIRT_PAGE_OFFSET(virt);
 
     pd_entry_t* base_page_directory = CR3_TO_PAGE_DIR(cr3);
-    pd_entry_t page_directory_entry = base_page_directory[offset_page_directory];
-    pt_entry_t* page_table_base = page_directory_entry.pt;
-    uint32_t phy = page_table_base[offset_table_directory].page;
-    page_table_base[offset_table_directory] = (pt_entry_t) {.attrs = 0, .page = 0}; // bit present en 0
 
-    tlbflush();
+    pd_entry_t page_directory_entry = base_page_directory[offset_page_directory];    
+    
+    if (page_directory_entry.attrs & MMU_P) {
+
+        pt_entry_t* page_table_base = page_directory_entry.pt;
+        phy = page_table_base[offset_table_directory].page << 12;
+        page_table_base[offset_table_directory].attrs &= ~MMU_P;// bit present en 0
+
+        tlbflush();
+
+    }
     return phy;
 }
 
@@ -212,15 +224,100 @@ void copy_page(paddr_t dst_addr, paddr_t src_addr) {
  * mmu_init_task_dir inicializa las estructuras de paginación vinculadas a una tarea cuyo código se encuentra en la dirección phy_start
  * @param phy_start es la dirección donde comienzan las dos páginas de código de la tarea asociada a esta llamada
  * @return el contenido que se ha de cargar en un registro CR3 para la tarea asociada a esta llamada
+   La rutina debe mapear las paginas de codigo como solo lectura, a partir de la direccion
+   virtual 0x08000000, el stack como lectura-escritura con base en 0x08003000 y la pagina de memoria compartida luego
+   00000 1000 00 | 00 0000 0000 | 0000 0000 0000
+   00000 1000 00 | 00 0000 0001 | 0000 0000 0000
+     offset dir    offset table    offset phy
+   del stack
  */
+
+#define CODE_VIRTUAL_ADDR 0x08000000
+#define STACK_VIRTUAL_ADDR 0x08003000
+#define SHARED_VIRTUAL_ADDR (STACK_VIRTUAL_ADDR + PAGE_SIZE)
 paddr_t mmu_init_task_dir(paddr_t phy_start) {
+
+  paddr_t directorio =  mmu_next_free_kernel_page();
+  zero_page(directorio);
+
+  //SETEAR ATRIBUTOS CR3
+  pd_entry_t* cr3 = (pd_entry_t*) directorio; //Esto funciona porque los atributos son todos 0
+
+  paddr_t tabla_kernel = mmu_next_free_kernel_page();
+  zero_page(tabla_kernel);
+
+  copy_page(tabla_kernel, (paddr_t)kpt); //Cambiar por identity mapping
+
+  //CARGAR DIRECCION DE TABLA KERNEL
+  cr3[0].pt = (uint32_t)tabla_kernel>>12; // tenemos que sacarle los ultimos 12 bits.
   
+  //SETEAR ATRIBUTOS TABLA KERNEL
+  cr3[0].attrs = MMU_P | MMU_W;
+
+  // pedimos una pagina para la tabla de tareas
+  pt_entry_t* tabla_tarea = (pt_entry_t*) mmu_next_free_kernel_page();
+
+  //CARGAR DIRECCION DE TABLA TAREA
+  cr3[VIRT_PAGE_DIR(TASK_CODE_VIRTUAL)].pt = (uint32_t)tabla_tarea>>12; // tenemos que sacarle los ultimos 12 bits.
+
+  //SETEAR ATRIBUTOS TABLA TAREA
+  cr3[VIRT_PAGE_DIR(TASK_CODE_VIRTUAL)].attrs = MMU_P | MMU_W | MMU_U; 
+
+  
+  //CREAR LA DIRECCION VIRTUAL y ATRIBUTOS PARA PHY START
+  //Mapeamos las paginas de codigo nivel 3
+  for (uint32_t i = 0; i < TASK_CODE_PAGES; i++){
+      mmu_map_page((uint32_t)cr3, TASK_CODE_VIRTUAL + i*PAGE_SIZE, phy_start + i*PAGE_SIZE, MMU_P | MMU_U);
+  }
+  
+  //Pido una pagina para la pila de nivel 3 (debe ser user)
+  paddr_t pila_phy = mmu_next_free_user_page();
+  //Ahora mapeo la pila de usuario
+  mmu_map_page((uint32_t)cr3, TASK_CODE_VIRTUAL + TASK_CODE_PAGES*PAGE_SIZE, pila_phy, MMU_P | MMU_U | MMU_W); 
+
+
+  //Mapeo el espacio compartido
+  mmu_map_page((uint32_t)cr3, TASK_SHARED_PAGE, SHARED, MMU_P | MMU_U);
+
+
+  //retornamos cr3  
+  return (paddr_t)cr3;
+
+    /*pd_entry_t* pd_phy_base = mmu_next_free_kernel_page(); // reservamos memoria para el page directory
+    zero_page(pd_phy_base);    
+
+    // mapeamos las dos paginas de codigo como solo lectura
+    mmu_map_page(pd_phy_base, CODE_VIRTUAL_ADDR, phy_start, 0x05);
+    mmu_map_page(pd_phy_base, CODE_VIRTUAL_ADDR + PAGE_SIZE, phy_start + PAGE_SIZE, 0x05);
+
+    // mapeamos stack como r/w
+    // attrs = 0b000000000111
+    paddr_t first_free_user_page = mmu_next_free_user_page();
+    mmu_map_page(pd_phy_base, STACK_VIRTUAL_ADDR, first_free_user_page, 0x07);
+
+    // mapeamos shared como r/w 
+    paddr_t second_free_user_page = mmu_next_free_user_page();
+    mmu_map_page(pd_phy_base, SHARED_VIRTUAL_ADDR, second_free_user_page, 0x07);
+
+    return pd_phy_base; // todos los atributos del CR3 en 0 PIBE
+*/
 }
 
 // COMPLETAR: devuelve true si se atendió el page fault y puede continuar la ejecución 
 // y false si no se pudo atender
 bool page_fault_handler(vaddr_t virt) {
-  print("Atendiendo page fault...", 0, 0, C_FG_WHITE | C_BG_BLACK);
-  // Chequeemos si el acceso fue dentro del area on-demand
-  // En caso de que si, mapear la pagina
+    print("Atendiendo page fault...", 0, 0, C_FG_WHITE | C_BG_BLACK);
+
+    // Chequeemos si el acceso fue dentro del area on-demand
+    if (virt >> 12 == ON_DEMAND_MEM_START_VIRTUAL >> 12) {
+        
+        // En caso de que si, mapear la pagina
+        mmu_map_page(rcr3(), virt, ON_DEMAND_MEM_START_PHYSICAL, MMU_P | MMU_U | MMU_W);
+        print("Atendidoo", 0, 10, C_FG_WHITE | C_BG_BLACK);
+        return 1;
+
+    } else
+        print("El PG no fue de la memoria on-demand", 0, 2, C_FG_WHITE | C_BG_BLACK);
+
+    return 0;
 }
