@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "kassert.h": "c",
-        "mmu.h": "c",
-        "i386.h": "c"
-    }
-}
