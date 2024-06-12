@@ -66,8 +66,19 @@
 #define DESC_CODE_DATA 1
 #define DESC_SYSTEM    0
 
-#define FLAT_SEGM_SIZE  (817U * (1 << 20))
+#define FLAT_SEGM_SIZE  GDT_LIMIT_4KIB(1024 * 1024 * 817)   // En 4k
 #define VIDEO_SEGM_SIZE (80U * 50 * 2)
+
+#define FLAT_SEGM_BASE 0x00000000
+
+#define BIT_ON  1
+#define BIT_OFF 0
+
+#define TYPE_READ_EXECUTE 0x0A   // 0b1010
+#define TYPE_READ_WRITE   0x02   // 0b0010
+
+#define ROOT_PRIVILEGE 0x0 // 0b00
+#define USER_PRIVILEGE 0x03 // 0b11
 
 /* Direcciones de memoria */
 /* -------------------------------------------------------------------------- */
@@ -91,13 +102,14 @@ VIRT_PAGE_DIR(X)    devuelve el page directory entry, donde X es una dirección 
 CR3_TO_PAGE_DIR(X)  devuelve el page directory, donde X es el contenido del registro CR3
 MMU_ENTRY_PADDR(X)  devuelve la dirección física de la base de un page frame o de un page table, donde X es el campo de 20 bits en una PTE o PDE
 
-#define VIRT_PAGE_OFFSET(X) ??
-#define VIRT_PAGE_TABLE(X)  ??
-#define VIRT_PAGE_DIR(X)    ??
-#define CR3_TO_PAGE_DIR(X)  ??
-#define MMU_ENTRY_PADDR(X)  ??
-
 */
+
+#define VIRT_PAGE_OFFSET(X) ((X) & 0xFFF)  
+#define VIRT_PAGE_TABLE(X)  (((X) >> 12) & 0x3FF)
+#define VIRT_PAGE_DIR(X)    (((X) >> 22) & 0x3FF)
+#define CR3_TO_PAGE_DIR(X)  (X & 0xFFFFF000)
+#define MMU_ENTRY_PADDR(X)  (X << 12) // le dejamos todo en 0 para ponerle el offset
+
 
 #define MMU_P (1 << 0)
 #define MMU_W (1 << 1)
