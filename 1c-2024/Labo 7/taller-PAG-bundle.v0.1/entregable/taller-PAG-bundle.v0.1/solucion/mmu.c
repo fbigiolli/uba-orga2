@@ -237,70 +237,31 @@ void copy_page(paddr_t dst_addr, paddr_t src_addr) {
 #define SHARED_VIRTUAL_ADDR (STACK_VIRTUAL_ADDR + PAGE_SIZE)
 paddr_t mmu_init_task_dir(paddr_t phy_start) {
 
-  paddr_t directorio =  mmu_next_free_kernel_page();
-  zero_page(directorio);
+    pd_entry_t* cr3 = mmu_next_free_kernel_page(); // reservamos memoria para el page directory
+    zero_page(cr3);    
 
-  //SETEAR ATRIBUTOS CR3
-  pd_entry_t* cr3 = (pd_entry_t*) directorio; //Esto funciona porque los atributos son todos 0
+    paddr_t tabla_kernel = mmu_next_free_kernel_page();
+    zero_page(tabla_kernel);
 
-  paddr_t tabla_kernel = mmu_next_free_kernel_page();
-  zero_page(tabla_kernel);
+    copy_page(tabla_kernel, (paddr_t) kpt);
 
-  copy_page(tabla_kernel, (paddr_t)kpt); //Cambiar por identity mapping
-
-  //CARGAR DIRECCION DE TABLA KERNEL
-  cr3[0].pt = (uint32_t)tabla_kernel>>12; // tenemos que sacarle los ultimos 12 bits.
-  
-  //SETEAR ATRIBUTOS TABLA KERNEL
-  cr3[0].attrs = MMU_P | MMU_W;
-
-  // pedimos una pagina para la tabla de tareas
-  pt_entry_t* tabla_tarea = (pt_entry_t*) mmu_next_free_kernel_page();
-
-  //CARGAR DIRECCION DE TABLA TAREA
-  cr3[VIRT_PAGE_DIR(TASK_CODE_VIRTUAL)].pt = (uint32_t)tabla_tarea>>12; // tenemos que sacarle los ultimos 12 bits.
-
-  //SETEAR ATRIBUTOS TABLA TAREA
-  cr3[VIRT_PAGE_DIR(TASK_CODE_VIRTUAL)].attrs = MMU_P | MMU_W | MMU_U; 
-
-  
-  //CREAR LA DIRECCION VIRTUAL y ATRIBUTOS PARA PHY START
-  //Mapeamos las paginas de codigo nivel 3
-  for (uint32_t i = 0; i < TASK_CODE_PAGES; i++){
-      mmu_map_page((uint32_t)cr3, TASK_CODE_VIRTUAL + i*PAGE_SIZE, phy_start + i*PAGE_SIZE, MMU_P | MMU_U);
-  }
-  
-  //Pido una pagina para la pila de nivel 3 (debe ser user)
-  paddr_t pila_phy = mmu_next_free_user_page();
-  //Ahora mapeo la pila de usuario
-  mmu_map_page((uint32_t)cr3, TASK_CODE_VIRTUAL + TASK_CODE_PAGES*PAGE_SIZE, pila_phy, MMU_P | MMU_U | MMU_W); 
-
-
-  //Mapeo el espacio compartido
-  mmu_map_page((uint32_t)cr3, TASK_SHARED_PAGE, SHARED, MMU_P | MMU_U);
-
-
-  //retornamos cr3  
-  return (paddr_t)cr3;
-
-    /*pd_entry_t* pd_phy_base = mmu_next_free_kernel_page(); // reservamos memoria para el page directory
-    zero_page(pd_phy_base);    
+    // Definimos una copia de la kpt en la entrada 0 del directorio
+    cr3[0] = (pd_entry_t){.attrs = MMU_P | MMU_W, .pt = tabla_kernel >> 12};
 
     // mapeamos las dos paginas de codigo como solo lectura
-    mmu_map_page(pd_phy_base, CODE_VIRTUAL_ADDR, phy_start, 0x05);
-    mmu_map_page(pd_phy_base, CODE_VIRTUAL_ADDR + PAGE_SIZE, phy_start + PAGE_SIZE, 0x05);
+    mmu_map_page(cr3, CODE_VIRTUAL_ADDR, phy_start, 0x05);
+    mmu_map_page(cr3, CODE_VIRTUAL_ADDR + PAGE_SIZE, phy_start + PAGE_SIZE, 0x05);
 
     // mapeamos stack como r/w
     // attrs = 0b000000000111
     paddr_t first_free_user_page = mmu_next_free_user_page();
-    mmu_map_page(pd_phy_base, STACK_VIRTUAL_ADDR, first_free_user_page, 0x07);
+    mmu_map_page(cr3, STACK_VIRTUAL_ADDR, first_free_user_page, 0x07);
 
     // mapeamos shared como r/w 
-    paddr_t second_free_user_page = mmu_next_free_user_page();
-    mmu_map_page(pd_phy_base, SHARED_VIRTUAL_ADDR, second_free_user_page, 0x07);
+    mmu_map_page(cr3, SHARED_VIRTUAL_ADDR, SHARED, 0x07);
 
-    return pd_phy_base; // todos los atributos del CR3 en 0 PIBE
-*/
+    return cr3; // todos los atributos del CR3 en 0 PIBE
+
 }
 
 // COMPLETAR: devuelve true si se atendió el page fault y puede continuar la ejecución 
