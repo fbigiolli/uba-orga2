@@ -58,7 +58,7 @@ void task() {
 	gol_grid gol;
 
 	randomize(gol);
-	int sleep_time = 50;
+	int sleep_time = 500;
 
 	while (!ENVIRONMENT->keyboard.escape) {
 		for (int i = 0; i < HEIGHT; i++) {

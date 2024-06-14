@@ -134,14 +134,14 @@ void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {
     // 2) Si no existe, crear la entrada
     
     if (!(page_directory_entry.attrs & MMU_P)) {
-        base_page_directory[offset_page_directory] = (pd_entry_t) {.attrs = attrs, .pt = (mmu_next_free_kernel_page() >> 12)};  
+        base_page_directory[offset_page_directory] = (pd_entry_t) {.attrs = MMU_P | MMU_U | MMU_W, .pt = (mmu_next_free_kernel_page() >> 12)};  
         // nos traemos el actualizado
         page_directory_entry = base_page_directory[offset_page_directory];
     }
     
     // 3) Crear la entrada de la page table
 
-    uint32_t newAttrs = (page_directory_entry.attrs | attrs) | MMU_P;
+    uint32_t newAttrs =  attrs | MMU_P;
     pt_entry_t* page_table_base = page_directory_entry.pt << 12;
     page_table_base[offset_table_directory] = (pt_entry_t) {.attrs = newAttrs, .page = phy >> 12};
 
@@ -233,7 +233,7 @@ void copy_page(paddr_t dst_addr, paddr_t src_addr) {
  */
 
 #define CODE_VIRTUAL_ADDR 0x08000000
-#define STACK_VIRTUAL_ADDR 0x08003000
+#define STACK_VIRTUAL_ADDR 0x08002000
 #define SHARED_VIRTUAL_ADDR (STACK_VIRTUAL_ADDR + PAGE_SIZE)
 paddr_t mmu_init_task_dir(paddr_t phy_start) {
 
@@ -249,16 +249,16 @@ paddr_t mmu_init_task_dir(paddr_t phy_start) {
     cr3[0] = (pd_entry_t){.attrs = MMU_P | MMU_W, .pt = tabla_kernel >> 12};
 
     // mapeamos las dos paginas de codigo como solo lectura
-    mmu_map_page(cr3, CODE_VIRTUAL_ADDR, phy_start, 0x05);
-    mmu_map_page(cr3, CODE_VIRTUAL_ADDR + PAGE_SIZE, phy_start + PAGE_SIZE, 0x05);
+    mmu_map_page(cr3, CODE_VIRTUAL_ADDR, phy_start, MMU_U | MMU_P);
+    mmu_map_page(cr3, CODE_VIRTUAL_ADDR + PAGE_SIZE, phy_start + PAGE_SIZE, MMU_U | MMU_P);
 
     // mapeamos stack como r/w
     // attrs = 0b000000000111
     paddr_t first_free_user_page = mmu_next_free_user_page();
-    mmu_map_page(cr3, STACK_VIRTUAL_ADDR, first_free_user_page, 0x07);
+    mmu_map_page(cr3, STACK_VIRTUAL_ADDR, first_free_user_page, MMU_U | MMU_P | MMU_W);
 
-    // mapeamos shared como r/w 
-    mmu_map_page(cr3, SHARED_VIRTUAL_ADDR, SHARED, 0x07);
+    // mapeamos shared como solo lectura
+    mmu_map_page(cr3, SHARED_VIRTUAL_ADDR, SHARED, MMU_U | MMU_P);
 
     return cr3; // todos los atributos del CR3 en 0 PIBE
 

@@ -136,7 +136,7 @@ modo_protegido:
     mov cr0, eax       
 
     ; Habilitamos interrupciones
-    sti
+    ; sti
 
     ; Interrumpimos
     ; int 88
@@ -164,12 +164,17 @@ modo_protegido:
     ; |       Index         |TI|RPL|
     ; +---------------------+--+--+
 
-    mov ax, GDT_TASK_INITIAL_SEL ;
+
+    mov ax, GDT_TASK_INITIAL_SEL 
     ltr ax ; (con ax = selector segmento tarea inicial)
-    
 
     call sched_init
     call tasks_init
+
+    mov ax, 5000
+    out 0x40, al
+    rol ax, 8
+    out 0x40, al
 
     jmp GDT_TASK_IDLE_SEL:0
     
