@@ -63,3 +63,24 @@ simultáneo?
 
 Para que parezca que los programas se están ejecutando en simultáneo, la CPU alterna el programa ejecutandose 
 en cada momento de, realizando muchos cambios en poco tiempo.  
+
+18) Por qué se definen 2 tipos de tareas? Como harían para ejecutar una tarea distinta? 
+Cambien la tarea Snake por una tarea PongScoreboard
+
+Se definen distintos tipos de tareas para poder hacer que haya tareas con código distinto. Por cada tipo de tarea
+que hay, hay una dirección distinta donde arranca el código. Para poder cambiar de tarea, podemos modificar el 
+makefile con el archivo .tsk de la tarea que queremos correr   
+
+19) Mirando la tarea Pong, ¿En que posición de memoria escribe esta tarea el puntaje que
+queremos imprimir? ¿Cómo funciona el mecanismo propuesto para compartir datos entre tareas?
+
+En la dirección de la memoria compartida, cada tarea utiliza su task_id como offset para escribir su puntaje,
+y no pisarse los valores entre ellas. Para poder compartir datos entre tareas, todas tienen acceso a la memoria
+compartida.
+
+void update_shared_record_score(pong* pong) {
+	uint8_t task_id = ENVIRONMENT->task_id;
+	uint32_t* current_task_record = (uint32_t*) SHARED_SCORE_BASE_VADDR + ((uint32_t) task_id * sizeof(uint32_t)*2);
+	current_task_record[0] = pong->player1.score;
+	current_task_record[1] = pong->player2.score;
+}

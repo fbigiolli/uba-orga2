@@ -180,7 +180,7 @@ paddr_t mmu_unmap_page(uint32_t cr3, vaddr_t virt) {
     
     if (page_directory_entry.attrs & MMU_P) {
 
-        pt_entry_t* page_table_base = page_directory_entry.pt;
+        pt_entry_t* page_table_base = page_directory_entry.pt << 12;
         phy = page_table_base[offset_table_directory].page << 12;
         page_table_base[offset_table_directory].attrs &= ~MMU_P;// bit present en 0
 
@@ -282,3 +282,4 @@ bool page_fault_handler(vaddr_t virt) {
 
     return 0;
 }
+

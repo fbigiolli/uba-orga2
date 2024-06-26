@@ -24,8 +24,8 @@ CFLAGS=-Wall -Wextra -pedantic -std=c99 -Og -ggdb \
 TASKSCFLAGS=$(CFLAGS) -DORGA2__TAREA__
 
 TASKIDLE=idle.tsk
-TASKA=taskGameOfLife.tsk
-TASKB=taskSnake.tsk
+TASKA=taskPong.tsk
+TASKB=taskPongScoreboard.tsk
 
 TASKS=tareas.tsk
 
